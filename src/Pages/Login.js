@@ -23,7 +23,7 @@ function Login() {
         validationSchema,
         onSubmit: (data) => {
             let httpMethod = 'post'
-            let endpoint = 'http://localhost:8000/login'
+            let endpoint = 'http://beyghairat.admee.co.uk:8000/login'
             let body = {
                 Credentials: {
                     email: data.Email,
