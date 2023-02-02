@@ -31,7 +31,7 @@ function SchoolsIU(props) {
         onSubmit: (data) => {
             console.log(JSON.stringify(data, null, 2));
             let httpMethod = props.editRow?.SchoolID > 0 ? 'put' : 'post'
-            let endpoint = 'http://localhost:8000/school'
+            let endpoint = 'http://beyghairat.admee.co.uk:8000/school'
             let body = {
                 "school": {
                     "SchoolID": data.SchoolID,

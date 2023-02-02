@@ -40,7 +40,7 @@ function Schools() {
                             <SchoolsIU editRow={editRow} handleModalClosed={handleModalClosed} />
                         </div >
                         <div className="card-body">
-                            <Grid api='http://localhost:8000/school/' editRow={editRowAction} />
+                            <Grid api='http://beyghairat.admee.co.uk:8000/school/' editRow={editRowAction} />
                         </div>
                     </div>
                 </section>

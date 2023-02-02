@@ -40,7 +40,7 @@ function Previliges() {
                             <PreviligesIU editRow={editRow} handleModalClosed={handleModalClosed} />
                         </div>
                         <div className="card-body">
-                            <Grid api='http://localhost:8000/previlige/' editRow={editRowAction} />
+                            <Grid api='http://beyghairat.admee.co.uk:8000/previlige/' editRow={editRowAction} />
                         </div>
 
                     </div>

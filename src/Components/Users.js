@@ -40,7 +40,7 @@ function Users() {
                             <UsersIU editRow={editRow} handleModalClosed={handleModalClosed} />
                         </div>
                         <div className="card-body">
-                            <Grid api='http://localhost:8000/users/' editRow={editRowAction} />
+                            <Grid api='http://beyghairat.admee.co.uk:8000/users/' editRow={editRowAction} />
                         </div>
                     </div>
                 </section>
