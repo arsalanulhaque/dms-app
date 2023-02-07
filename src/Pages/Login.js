@@ -35,9 +35,9 @@ function Login() {
             }
 
             FetchData(endpoint, httpMethod, body, (result) => {
-                if (result.data.error) {
+                if (result?.data?.error) {
                     setAlertType('danger')
-                    setMessage(result.data.message)
+                    setMessage(result?.data?.message)
                 }
                 else {
                     session.message = result.data.message
