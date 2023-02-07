@@ -1286,3 +1286,8 @@ div#submitForm input {
 .btn-bookNow:hover {
   color: #094ec5;
 }
+
+.spinner-big{
+  width: 15rem;
+  height: 15rem;
+}

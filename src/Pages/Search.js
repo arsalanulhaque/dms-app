@@ -10,6 +10,7 @@ function Search() {
     const { session } = useContext(SessionContext);
     const [alertType, setAlertType] = useState('')
     const [message, setMessage] = useState('')
+    const [isLoader, setLoader] = useState(false)
     const [results, setResults] = useState([])
 
 
@@ -113,29 +114,32 @@ function Search() {
 
 
     const onBookDevice = async (prod) => {
+        setLoader(true)
         let flag = false
-        //if (insertDeviceStatus(prod)) {
-        setTimeout(() => {
-            if (updateDeviceStatus(prod, 1)) {
-                flag = true
-            }
+        if (insertDeviceStatus(prod)) {
+            setTimeout(() => {
+                if (updateDeviceStatus(prod, 1)) {
+                    flag = true
+                }
 
-            if (flag) {
-                setResults([])
-                setAlertType('success')
-                setMessage("Device has been returned successfully.")
-            }
-            else {
-                setAlertType('danger')
-                setMessage("Something wrong went!")
+                if (flag) {
+                    setResults([])
+                    setAlertType('success')
+                    setMessage("Device has been issued successfully.")
+                }
+                else {
+                    setAlertType('danger')
+                    setMessage("Something wrong went!")
 
-            }
-        }, 5000);
+                }
+                setLoader(false)
+            }, 3000);
 
-        //}
+        }
     }
 
     const onReturnDevice = async (prod) => {
+        setLoader(true)
         let flag = false
         if (updateReturnDeviceStatus(prod)) {
             setTimeout(() => {
@@ -152,7 +156,8 @@ function Search() {
                     setAlertType('danger')
                     setMessage("Something wrong went!")
                 }
-            }, 5000);
+                setLoader(false)
+            }, 3000);
         }
     }
 
@@ -176,6 +181,19 @@ function Search() {
                     </div>
                 </div>
                 {
+                    isLoader === true ?
+                        <div className="d-flex rounded justify-content-md-center align-items-center w-100 mt-5 mr-5">
+                            <div className="row h-50 d-inline-block">
+                                <div className="col-12">
+                                    <div className="spinner-border text-primary spinner-big" role="status">
+                                        <span className="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        : ''
+                }
+                {
                     message?.length > 0 ?
                         <div className=" d-flex justify-content-md-center align-items-center search">
                             <div className="row w-50">
@@ -187,38 +205,42 @@ function Search() {
                         : ''
                 }
             </div>
-            <div className="container-fluid mt-5">
-                <div className="row">
-                    {
-                        results.map((prod) =>
-                            <div className="col-sm-3">
-                                <div className="card border border-2 rounded">
-                                    <div className="card-body">
-                                        <div className="row card-title bottom border-1 border-bottom" >
-                                            <div className="col-7">
-                                                <h5 >Asset# {prod.AssetID}</h5>
-                                            </div>
-                                            <div className="col-5">
-                                                {prod.IsIssued === 0 ? <span className="btn-bookNow fs-6 float-end fw-bold" onClick={() => onBookDevice(prod)}>Book Now</span> : ''}
-                                                {prod.IsIssued === 1 && prod.UserID !== session.UserID ?
-                                                    <span className="btn-bookNow fs-6 float-end fw-bold" onClick={() => onReturnDevice(prod)}>Return Now</span> :
-                                                    prod.IsIssued === 1 && prod.DeviceStatusID === prod.DeviceID ?
-                                                        <span className="btn-already-booked fs-6 float-end fw-bold">Already Booked</span> : ''}
-                                            </div>
-                                        </div>
-                                        <div className="row">
-                                            <div className="col-8">
-                                                <p className="card-text">Device Name: {prod.DeviceName}</p>
-                                                <p className="card-text">Model: {prod.Model}</p>
+            {
+                isLoader === false ?
+                    <div className="container-fluid mt-5">
+                        <div className="row">
+                            {
+                                results.map((prod) =>
+                                    <div className="col-sm-3">
+                                        <div className="card border border-2 rounded">
+                                            <div className="card-body">
+                                                <div className="row card-title bottom border-1 border-bottom" >
+                                                    <div className="col-7">
+                                                        <h5 >Asset# {prod.AssetID}</h5>
+                                                    </div>
+                                                    <div className="col-5">
+                                                        {prod.IsIssued === 0 ? <span className="btn-bookNow fs-6 float-end fw-bold" onClick={() => onBookDevice(prod)}>Book Now</span> : ''}
+                                                        {prod.IsIssued === 1 && prod.UserID !== session.UserID ?
+                                                            <span className="btn-bookNow fs-6 float-end fw-bold" onClick={() => onReturnDevice(prod)}>Return Now</span> :
+                                                            prod.IsIssued === 1 && prod.DeviceStatusID === prod.DeviceID ?
+                                                                <span className="btn-already-booked fs-6 float-end fw-bold">Already Booked</span> : ''}
+                                                    </div>
+                                                </div>
+                                                <div className="row">
+                                                    <div className="col-8">
+                                                        <p className="card-text">Device Name: {prod.DeviceName}</p>
+                                                        <p className="card-text">Model: {prod.Model}</p>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        )
-                    }
-                </div>
-            </div>
+                                )
+                            }
+                        </div>
+                    </div>
+                    : ''
+            }
         </>
     );
 }
