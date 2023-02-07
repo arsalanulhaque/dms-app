@@ -14,11 +14,14 @@ const FetchData = async (endpoint, method, body, callback) => {
         break;
       case 'put':
         response = await axios.put(endpoint, body)
-        callback(response?.data?.message)
+        callback(response)
         break;
       case 'post':
         response = await axios.post(endpoint, body)
-        callback(endpoint.indexOf('login') === -1 ? response?.data?.message : response)
+        if (endpoint.indexOf('login') === -1 || endpoint.indexOf('search') === -1)
+          callback(response)
+        else
+          callback(response?.data?.message)
         break;
       default:
         break;

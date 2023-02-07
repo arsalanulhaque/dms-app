@@ -29,7 +29,7 @@ function PreviligesIU(props) {
         onSubmit: (data) => {
             console.log(JSON.stringify(data, null, 2));
             let httpMethod = props.editRow?.PreviligeID > 0 ? 'put' : 'post'
-            let endpoint = 'http://beyghairat.admee.co.uk:8000/previlige'
+            let endpoint = 'http://localhost:8000/previlige'
             let body = {
                 "previlige": {
                     "PreviligeID": data.PreviligeID,

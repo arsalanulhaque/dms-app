@@ -23,7 +23,7 @@ function DeviceStatus() {
                                     <DeviceStatusIU />
                                 </div>
                                 <div className="card-body">
-                                    <Grid api='http://beyghairat.admee.co.uk:8000/devicestatus/' />
+                                    <Grid api='http://localhost:8000/devicestatus/school' />
                                 </div>
                             </div>
                             {/* <!--Content End -- > */}

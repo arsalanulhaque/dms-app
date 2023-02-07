@@ -37,7 +37,7 @@ function UsersIU(props) {
         onSubmit: (data) => {
             console.log(JSON.stringify(data, null, 2));
             let httpMethod = props.editRow?.UserID > 0 ? 'put' : 'post'
-            let endpoint = 'http://beyghairat.admee.co.uk:8000/users'
+            let endpoint = 'http://localhost:8000/users'
             let body = {
                 "user": {
                     "UserID": props.editRow.UserID,
@@ -102,7 +102,7 @@ function UsersIU(props) {
                             <div className="form-group">
                                 <label htmlFor="SchoolName">School Name</label>
                                 <Dropdown name="SchoolName"
-                                    api="http://beyghairat.admee.co.uk:8000/school"
+                                    api="http://localhost:8000/school"
                                     keyField='SchoolID'
                                     valueField='SchoolName'
                                     type="text"
@@ -159,7 +159,7 @@ function UsersIU(props) {
                             <div className="form-group">
                                 <label htmlFor="PreviligeName">Role Name</label>
                                 <Dropdown name="PreviligeName"
-                                    api="http://beyghairat.admee.co.uk:8000/previlige"
+                                    api="http://localhost:8000/previlige"
                                     keyField='PreviligeID'
                                     valueField='PreviligeName'
                                     type="text"

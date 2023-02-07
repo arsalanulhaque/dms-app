@@ -10,6 +10,7 @@ function Previliges() {
     const [editRow, setEditRow] = useState({})
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
+    const [reloadGrid, setReload] = useState(false)
 
     const editRowAction = (params) => {
         setEditRow(params.row)
@@ -17,9 +18,10 @@ function Previliges() {
 
     const handleModalClosed = (message, alertType, isClosed) => {
         if (isClosed) {
-            setEditRow(null)
+            setEditRow({})
             setMessage(message)
             setAlertType(alertType)
+            setReload(true)
         }
     }
 
@@ -40,7 +42,7 @@ function Previliges() {
                             <PreviligesIU editRow={editRow} handleModalClosed={handleModalClosed} />
                         </div>
                         <div className="card-body">
-                            <Grid api='http://beyghairat.admee.co.uk:8000/previlige/' editRow={editRowAction} />
+                            <Grid api='http://localhost:8000/previlige' editRow={editRowAction} reload={reloadGrid} />
                         </div>
 
                     </div>

@@ -10,6 +10,7 @@ function Devices() {
     const [editRow, setEditRow] = useState({})
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
+    const [reloadGrid, setReload] = useState(false)
 
     const editRowAction = (params) => {
         setEditRow(params.row)
@@ -20,6 +21,7 @@ function Devices() {
             setEditRow({})
             setMessage(message)
             setAlertType(alertType)
+            setReload(true)
         }
     }
 
@@ -40,7 +42,7 @@ function Devices() {
                             <DeviceIU editRow={editRow} handleModalClosed={handleModalClosed} />
                         </div>
                         <div className="card-body">
-                            <Grid api='http://beyghairat.admee.co.uk:8000/device/' editRow={editRowAction} />
+                            <Grid api='http://localhost:8000/device' editRow={editRowAction} reload={reloadGrid} />
                         </div>
                     </div>
                 </section>

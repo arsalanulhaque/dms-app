@@ -5,10 +5,13 @@ import FetchData from '../Hooks/FetchData'
 import React, { useContext, useEffect, useState, } from "react";
 import SessionContext from '../Context/SessionContext'
 import { useNavigate } from 'react-router-dom';
+import Alert from 'react-bootstrap/Alert';
 
 function Login() {
     const { session } = useContext(SessionContext);
     const navigate = useNavigate();
+    const [alertType, setAlertType] = useState('')
+    const [message, setMessage] = useState('')
 
     const validationSchema = Yup.object().shape({
         Email: Yup.string().email().required('Email is required'),
@@ -23,7 +26,7 @@ function Login() {
         validationSchema,
         onSubmit: (data) => {
             let httpMethod = 'post'
-            let endpoint = 'http://beyghairat.admee.co.uk:8000/login'
+            let endpoint = 'http://localhost:8000/login'
             let body = {
                 Credentials: {
                     email: data.Email,
@@ -32,12 +35,20 @@ function Login() {
             }
 
             FetchData(endpoint, httpMethod, body, (result) => {
-                session.message = result.data.message
-                session.data = result.data.data
-                session.error = result.data.error
-                session.isAdmin = result.data.data[0].PreviligeName === 'Admin' ? true : false
-                session.isSuperAdmin = result.data.data[0].PreviligeName === 'Super Admin' ? true : false
-                navigate(session.isAdmin || session.isSuperAdmin === true ? '/dashboard' : '/home')
+                if (result.data.error) {
+                    setAlertType('danger')
+                    setMessage(result.data.message)
+                }
+                else {
+                    session.message = result.data.message
+                    session.data = result.data.data
+                    session.error = result.data.error
+                    session.isAdmin = result.data.data[0].PreviligeName === 'Admin' ? true : false
+                    session.isSuperAdmin = result.data.data[0].PreviligeName === 'Super Admin' ? true : false
+                    session.schoolID = result.data.data[0].SchoolID
+                    session.userID = result.data.data[0].UserID
+                    navigate(session.isAdmin || session.isSuperAdmin === true ? '/dashboard' : '/search')
+                }
             })
         },
     });
@@ -100,7 +111,9 @@ function Login() {
                                             <button className="btn btn-primary w-100" type="submit">Login</button>
                                         </div>
                                         <div className="col-12">
-                                            <p className="small mb-0">Don't have account? <Link to="/register">Create an account</Link></p>
+                                            <Alert key={alertType} variant={alertType}>
+                                                {message}
+                                            </Alert>
                                         </div>
                                     </form>
 

@@ -41,7 +41,7 @@ function DeviceIU(props) {
         onSubmit: (data) => {
             console.log(JSON.stringify(data, null, 2));
             let httpMethod = props.editRow?.DeviceID > 0 ? 'put' : 'post'
-            let endpoint = 'http://beyghairat.admee.co.uk:8000/device'
+            let endpoint = 'http://localhost:8000/device'
             let body = {
                 "device": {
                     "SchoolID": data.SchoolID,
@@ -64,7 +64,7 @@ function DeviceIU(props) {
 
     useEffect(() => {
         if (props.editRow?.DeviceID > -1) {
-            formik.initialValues.SchoolID = props.editRow.SchoolID
+            formik.initialValues.SchoolID = props.editRow.FKSchoolID
             formik.initialValues.SchoolName = props.editRow.SchoolName
             formik.initialValues.IMEI = props.editRow.IMEI
             formik.initialValues.DeviceName = props.editRow.DeviceName
@@ -73,7 +73,7 @@ function DeviceIU(props) {
             formik.initialValues.IsIssued = props.editRow.IsIssued === 1 ? 'checked' : 'unchecked'
             showModal()
         }
-    }, [props,])
+    }, [props, formik.initialValues])
 
     const showModal = () => {
         setVisible(true)
@@ -103,7 +103,10 @@ function DeviceIU(props) {
                             <div className="form-group">
                                 <label htmlFor="SchoolID">School Name</label>
                                 <Dropdown name="SchoolID"
-                                    type="text"
+                                    api="http://localhost:8000/school"
+                                    keyField='SchoolID'
+                                    valueField='SchoolName'
+                                    type="Dropdown"
                                     selectedValue={formik.values.SchoolName}
                                     onChange={onSchoolChange}
                                 />
@@ -184,18 +187,17 @@ function DeviceIU(props) {
                             </div>
                             <div className="form-group">
                                 <button
-                                    type="button"
+                                    type="reset"
                                     className="btn btn-warning float-right"
-                                    onClick={formik.handleReset}
-                                >
+                                    onClick={ e => formik.resetForm()}>
                                     Reset
                                 </button>
                             </div>
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        <button type="button" class="btn btn-secondary" onClick={() => hideModal('info', props.editRow?.DeviceID > -1 ? 'Edit action cancelled by user!' : 'Add action cancelled by user!')}>Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" className="btn btn-secondary" onClick={() => hideModal('info', 'Action cancelled by user!')}>Cancel</button>
+                        <button type="submit" className="btn btn-primary">Save</button>
                     </ModalFooter>
                 </form>
             </Modal>

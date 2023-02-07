@@ -3,7 +3,7 @@ import {useContext } from "react";
 import Login from './Pages/Login'
 import Register from './Pages/Register'
 import Dashboard from './Pages/Dashboard'
-import Home from './Pages/Home'
+import Search from './Pages/Search'
 
 import Grid from './Components/Controls/Grid'
 
@@ -36,15 +36,14 @@ function AppWrapper() {
                 <Route path='/register' element={<Register />} />
 
                 <Route path='/dashboard' element={<Dashboard />} />
-                <Route path='/home' element={<Home />} />
+                <Route path='/search' element={<Search />} />
 
                 <Route path='/managedevices' element={<Devices />} />
                 <Route path='/managedevicestatus' element={<DeviceStatus />} />
                 <Route path='/managepreviliges' element={<Previliges />} />
                 <Route path='/manageschools' element={<Schools />} />
                 <Route path='/manageusers' element={<Users />} />
-
-                <Route path='/Grid' element={<Grid api='http://beyghairat.admee.co.uk:8000/school' />} />
+                
               </Routes>
             </BrowserRouter>
 

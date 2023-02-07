@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from './Pages/Login'
 import Register from './Pages/Register'
 import Dashboard from './Pages/Dashboard'
-import Home from './Pages/Home'
+import Home from './Pages/Search'
 
 import Grid from './Components/Controls/Grid'
 
@@ -34,7 +34,7 @@ function App() {
     //         <Route path='/manageschools' element={<Schools />} />
     //         <Route path='/manageusers' element={<Users />} />
 
-    //         <Route path='/Grid' element={<Grid api='http://beyghairat.admee.co.uk:8000/school' />} />
+    //         <Route path='/Grid' element={<Grid api='http://localhost:8000/school' />} />
     //       </Routes>
     //     </BrowserRouter>
 

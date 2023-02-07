@@ -2,6 +2,10 @@ import '../style.css';
 import { Link } from "react-router-dom";
 import SessionContext from '../Context/SessionContext'
 import React, { useContext, useEffect, useState, } from "react";
+import iconUser from '../assets/img/user.png'
+import iconSchool from '../assets/img/school.png'
+import iconPrevilige from '../assets/img/previlige.png'
+import iconDevice from '../assets/img/devices.png'
 
 function Sidebar() {
     const { session } = useContext(SessionContext)
@@ -12,7 +16,7 @@ function Sidebar() {
         session.data.map((item) => {
             let i = arr.find(i => i.MenuName === item.MenuName)
             if (i === undefined) {
-                let o = { 'Link': item.Link, 'MenuName': item.MenuName }
+                let o = { 'Link': item.Link, 'MenuName': item.MenuName, Icon: item.Icon }
                 arr.push(o)
             }
         })
@@ -29,7 +33,14 @@ function Sidebar() {
                         nav.map(item => {
                             return <li className="nav-item" key={item.MenuName}>
                                 <Link to={item.Link} className="nav-link collapsed" >
-                                    <i className="bi bi-menu-button-wide"></i><span>{item.MenuName}</span><i className="bi bi-chevron-down ms-auto"></i>
+                                    <i className="bi bi-menu-button-wide">
+                                        <img src={item.Icon === 'user' ? iconUser :
+                                            item.Icon === 'previlige' ? iconPrevilige :
+                                                item.Icon === 'devices' ? iconDevice :
+                                                    item.Icon === 'school' ? iconSchool : ''} height='30' />
+                                    </i>
+                                    <span>{item.MenuName}</span>
+
                                 </Link>
                             </li>
                         })

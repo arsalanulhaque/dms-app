@@ -1,6 +1,6 @@
 import Login from '../Pages/Login'
 import Dashboard from '../Pages/Dashboard'
-import Home from '../Pages/Home'
+import Home from '../Pages/Search'
 import DeviceStatus from '../Components/DeviceStatus'
 import Devices from '../Components/Devices'
 import Previliges from '../Components/Previliges'
