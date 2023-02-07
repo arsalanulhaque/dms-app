@@ -42,7 +42,7 @@ function Devices() {
                             <DeviceIU editRow={editRow} handleModalClosed={handleModalClosed} />
                         </div>
                         <div className="card-body">
-                            <Grid api='http://localhost:8000/device' editRow={editRowAction} reload={reloadGrid} />
+                            <Grid api='http://dms.admee.co.uk/device' editRow={editRowAction} reload={reloadGrid} />
                         </div>
                     </div>
                 </section>

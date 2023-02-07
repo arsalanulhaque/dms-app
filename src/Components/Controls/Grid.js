@@ -20,19 +20,19 @@ const Grid = (props) => {
     let body = {}
     switch (window.location.pathname) {
       case '/manageschools':
-        endpoint = 'http://localhost:8000/school'
+        endpoint = 'http://dms.admee.co.uk/school'
         body = { "SchoolID": id }
         break;
       case '/managedevices':
-        endpoint = 'http://localhost:8000/device'
+        endpoint = 'http://dms.admee.co.uk/device'
         body = { "DeviceID": id }
         break;
       case '/managepreviliges':
-        endpoint = 'http://localhost:8000/previlige'
+        endpoint = 'http://dms.admee.co.uk/previlige'
         body = { "PreviligeID": id }
         break;
       case '/manageusers':
-        endpoint = 'http://localhost:8000/users'
+        endpoint = 'http://dms.admee.co.uk/users'
         body = { "UserID": id }
         break;
       default:

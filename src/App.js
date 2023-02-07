@@ -34,7 +34,7 @@ function App() {
     //         <Route path='/manageschools' element={<Schools />} />
     //         <Route path='/manageusers' element={<Users />} />
 
-    //         <Route path='/Grid' element={<Grid api='http://localhost:8000/school' />} />
+    //         <Route path='/Grid' element={<Grid api='http://dms.admee.co.uk/school' />} />
     //       </Routes>
     //     </BrowserRouter>
 

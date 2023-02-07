@@ -24,7 +24,7 @@ function Search() {
         event.preventDefault()
         reset()
         let httpMethod = 'post'
-        let endpoint = 'http://localhost:8000/search'
+        let endpoint = 'http://dms.admee.co.uk/search'
         let body = {
             "Criteria": {
                 input: event.target[0].value,
@@ -48,7 +48,7 @@ function Search() {
     //Insert new record in Device Status Table 
     const insertDeviceStatus = async (prod) => {
         let httpMethod = 'post'
-        let endpoint = 'http://localhost:8000/devicestatus'
+        let endpoint = 'http://dms.admee.co.uk/devicestatus'
         let body = {
             "devicestatus": {
                 DeviceID: prod.DeviceID,
@@ -70,7 +70,7 @@ function Search() {
     //Update return status in Device Status Table 
     const updateReturnDeviceStatus = async (prod) => {
         let httpMethod = 'put'
-        let endpoint = 'http://localhost:8000/returndevicestatus'
+        let endpoint = 'http://dms.admee.co.uk/returndevicestatus'
         let body = {
             "devicestatus": {
                 DeviceStatusID: prod.DeviceStatusID,
@@ -92,7 +92,7 @@ function Search() {
     //Update Issued column in Device Table
     const updateDeviceStatus = async (prod, isIssued) => {
         let httpMethod = 'put'
-        let endpoint = isIssued === 1 ? 'http://localhost:8000/issuedevice' : 'http://localhost:8000/returndevice'
+        let endpoint = isIssued === 1 ? 'http://dms.admee.co.uk/issuedevice' : 'http://dms.admee.co.uk/returndevice'
         let body = {
             "device": {
                 DeviceID: prod.DeviceID,

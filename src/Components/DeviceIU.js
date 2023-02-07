@@ -41,7 +41,7 @@ function DeviceIU(props) {
         onSubmit: (data) => {
             console.log(JSON.stringify(data, null, 2));
             let httpMethod = props.editRow?.DeviceID > 0 ? 'put' : 'post'
-            let endpoint = 'http://localhost:8000/device'
+            let endpoint = 'http://dms.admee.co.uk/device'
             let body = {
                 "device": {
                     "SchoolID": data.SchoolID,
@@ -103,7 +103,7 @@ function DeviceIU(props) {
                             <div className="form-group">
                                 <label htmlFor="SchoolID">School Name</label>
                                 <Dropdown name="SchoolID"
-                                    api="http://localhost:8000/school"
+                                    api="http://dms.admee.co.uk/school"
                                     keyField='SchoolID'
                                     valueField='SchoolName'
                                     type="Dropdown"
