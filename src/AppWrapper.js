@@ -5,19 +5,15 @@ import Register from './Pages/Register'
 import Dashboard from './Pages/Dashboard'
 import Search from './Pages/Search'
 
-import Grid from './Components/Controls/Grid'
-
 import Devices from './Components/Devices';
 import DeviceStatus from './Components/DeviceStatus';
 import Previliges from './Components/Previliges';
 import Schools from './Components/Schools'
 import Users from './Components/Users';
-import Header from "./Components/Header";
 import './style.css';
 import { Link, Routes } from "react-router-dom";
 import SessionContext from './Context/SessionContext'
-import App from "./App";
-import Sidebar from "./Components/Sidebar";
+
 import {
     BrowserRouter,
     Route,

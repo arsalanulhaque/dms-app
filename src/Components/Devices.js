@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
@@ -18,12 +18,22 @@ function Devices() {
 
     const handleModalClosed = (message, alertType, isClosed) => {
         if (isClosed) {
-            setEditRow({})
+            setEditRow(null)
             setMessage(message)
             setAlertType(alertType)
             setReload(true)
         }
     }
+
+    const handleRowDelete = (message, alertType) => {
+        setMessage(message)
+        setAlertType(alertType)
+        setReload(true)
+    }
+
+    useEffect(() => {
+        setReload(false)
+    }, [])
 
     return (
         <>
@@ -42,7 +52,7 @@ function Devices() {
                             <DeviceIU editRow={editRow} handleModalClosed={handleModalClosed} />
                         </div>
                         <div className="card-body">
-                            <Grid api='http://dms.admee.co.uk/device' editRow={editRowAction} reload={reloadGrid} />
+                            <Grid api='device' editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
                         </div>
                     </div>
                 </section>

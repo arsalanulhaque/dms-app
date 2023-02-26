@@ -7,40 +7,50 @@ import ModalBody from "react-bootstrap/ModalBody";
 import ModalFooter from "react-bootstrap/ModalFooter";
 import { useFormik } from "formik";
 import * as Yup from 'yup';
+import Dropdown from './Controls/Dropdown'
 import FetchData from '../Hooks/FetchData'
+import Alert from 'react-bootstrap/Alert';
+
 
 function PreviligesIU(props) {
     const [isVisible, setVisible] = useState(false)
+    const [message, setMessage] = useState('')
+    const [alertType, setAlertType] = useState('')
 
     const validationSchema = Yup.object().shape({
-        PreviligeName: Yup.string()
-            .required('Previlige name is required'),
+        SchoolID: Yup.number().required('School ID is required'),
+        PreviligeName: Yup.string().required('Previlige name is required'),
     });
 
     const formik = useFormik({
         initialValues: {
-            PreviligeID: 0,
+            PreviligeID: -1,
+            SchoolID: -1,
             PreviligeName: "",
-            IsAdmin: false,
         },
         validationSchema,
-        // validateOnChange: false,
-        // validateOnBlur: false,
+        validateOnChange: true,
+        validateOnBlur: false,
         onSubmit: (data) => {
-            console.log(JSON.stringify(data, null, 2));
             let httpMethod = props.editRow?.PreviligeID > 0 ? 'put' : 'post'
-            let endpoint = 'http://dms.admee.co.uk/previlige'
+            let endpoint = 'previlige'
             let body = {
                 "previlige": {
-                    "PreviligeID": data.PreviligeID,
+                    "PreviligeID": props?.editRow?.PreviligeID > 0 ? props?.editRow?.PreviligeID : null,
                     "PreviligeName": data.PreviligeName,
-                    "IsAdmin": data.IsAdmin,
+                    "SchoolID": data.SchoolID,
                 }
             }
 
 
             FetchData(endpoint, httpMethod, body, (result) => {
-                hideModal('info', result)
+                if (!result.data.error) {
+                    hideModal(result?.data?.error === true ? 'danger' : 'success', result?.data?.message)
+                }
+                else {
+                    setAlertType('danger')
+                    setMessage(result.data.message)
+                }
             })
         },
 
@@ -48,21 +58,31 @@ function PreviligesIU(props) {
 
     useEffect(() => {
         if (props.editRow?.PreviligeID > -1) {
+            showModal()
+            formik.initialValues.SchoolID = props.editRow.FKSchoolID
             formik.initialValues.PreviligeID = props.editRow.PreviligeID
             formik.initialValues.PreviligeName = props.editRow.PreviligeName
-            formik.initialValues.IsAdmin = props.editRow.IsAdmin
-            showModal()
+        } else {
+            formik.initialValues.SchoolID = -1
+            formik.initialValues.PreviligeID = -1
+            formik.initialValues.PreviligeName = ""
         }
-    }, [props])
+    }, [props, isVisible, formik, formik.initialValues])
 
     const showModal = () => {
         setVisible(true)
     };
 
     const hideModal = (alertType, msg) => {
+        formik.resetForm()
+        setMessage('')
         setVisible(false)
         props.handleModalClosed(msg, alertType, true);
     };
+
+    const onSchoolChange = (e) => {
+        formik.initialValues.SchoolID = e.target.selectedOptions[0].id
+    }
 
     return (
         <>
@@ -75,7 +95,23 @@ function PreviligesIU(props) {
                         <ModalTitle>{props.editRow?.PreviligeID > -1 ? 'Update Existing' : 'Add New'} Role</ModalTitle>
                     </ModalHeader>
                     <ModalBody>
-                        <div className="register-form">
+                        {message.length <= 0 ? null : <Alert key={alertType} variant={alertType}>
+                            {message}
+                        </Alert>}
+                        <div className="">
+                            <div className="form-group">
+                                <label htmlFor="SchoolID">School Name</label>
+                                <Dropdown name="SchoolID"
+                                    api="school"
+                                    keyField='SchoolID'
+                                    valueField='SchoolName'
+                                    selectedValue={formik.values.SchoolID}
+                                    onChange={value => formik.setFieldValue('SchoolID', value.value)}
+                                />
+                                <div className="text-danger">
+                                    {formik.errors.SchoolID ? formik.errors.SchoolID : null}
+                                </div>
+                            </div>
 
                             <div className="form-group">
                                 <label htmlFor="PreviligeName">Role Name</label>
@@ -91,32 +127,11 @@ function PreviligesIU(props) {
                                 </div>
                             </div>
 
-                            <div className="form-group form-check">
-                                <input
-                                    name="IsAdmin"
-                                    type="checkbox"
-                                    className="form-check-input"
-                                    onChange={formik.handleChange}
-                                    checked={formik.values.IsAdmin}
-                                />
-                                <label htmlFor="IsAdmin" className="form-check-label">
-                                    Is Admin Role?
-                                </label>
-                            </div>
-
-                            <div className="form-group">
-                                <button
-                                    type="button"
-                                    className="btn btn-warning float-right"
-                                    onClick={formik.handleReset}
-                                >
-                                    Reset
-                                </button>
-                            </div>
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        <button type="button" className="btn btn-secondary" onClick={() => hideModal('info', props.editRow?.SchoolID > -1 ? 'Edit action cancelled by user!' : 'Add action cancelled by user!')}>Cancel</button>
+                        <button type="reset" className="btn btn-warning" onClick={formik.handleReset}>Reset</button>
+                        <button type="button" className="btn btn-secondary" onClick={() => hideModal('info', 'Action cancelled by user!')}>Cancel</button>
                         <button type="submit" className="btn btn-primary">Save</button>
                     </ModalFooter>
                 </form>

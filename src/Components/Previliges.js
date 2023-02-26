@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
@@ -14,16 +14,27 @@ function Previliges() {
 
     const editRowAction = (params) => {
         setEditRow(params.row)
+        setReload(false)
     }
 
     const handleModalClosed = (message, alertType, isClosed) => {
         if (isClosed) {
-            setEditRow({})
+            setEditRow(null)
             setMessage(message)
             setAlertType(alertType)
             setReload(true)
         }
     }
+
+    const handleRowDelete = (message, alertType) => {
+        setMessage(message)
+        setAlertType(alertType)
+        setReload(true)
+    }
+
+    useEffect(() => {
+        setReload(false)
+    }, [])
 
     return (
         <>
@@ -42,14 +53,13 @@ function Previliges() {
                             <PreviligesIU editRow={editRow} handleModalClosed={handleModalClosed} />
                         </div>
                         <div className="card-body">
-                            <Grid api='http://dms.admee.co.uk/previlige' editRow={editRowAction} reload={reloadGrid} />
+                            <Grid api='previlige' editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
                         </div>
-
                     </div>
                 </section>
             </main >
         </>
-    );
+    )
 }
 
 export default Previliges;

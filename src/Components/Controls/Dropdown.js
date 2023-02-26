@@ -1,37 +1,42 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import FetchData from '../../Hooks/FetchData'
+import SessionContext from '../../Context/SessionContext'
+import Select from 'react-select'
+import $ from "jquery";
 
 function Dropdown(props) {
     const [data, setData] = useState([])
-    const [selectedValue, setSelectedValue] = useState([])
+    const { session } = useContext(SessionContext);
 
     useEffect(() => {
-        fetch(props.api).then((result) => {
-            result.json().then((result) => {
+        $(function () {
+            $('div.form-control').removeClass("form-control")
+        })
+
+        let options = [{ value: -1, label: 'Select' }]
+
+        FetchData(session.isSuperAdmin ? props.api : `${props.api}/${session.schoolID}`, 'get', null, (result) => {
+            if (result.error === false) {
                 let res = result
-                let options = [{ key: -1, value: 'Select' }]
                 res.data.map(obj => {
-                    options.push({ key: obj[props.keyField], value: obj[props.valueField] })
+                    options.push({ value: obj[props.keyField], label: obj[props.valueField] })
                 })
                 setData(options)
-                if (props.selectedValue !== undefined) {
-                    setSelectedValue(props.selectedValue)
-                }
-            })
+            }
         })
     }, [])
 
-    const handleChange = (e) => {
-        props.onChange(e)
-        setSelectedValue(e.target.value)
+    const defaultValue = (options, value) => {
+        return options ? options.find(option => option.value === value) : ''
     }
 
     return (
         <div>
-            <select className="form-control" value={selectedValue} onChange={e => handleChange(e)}>
-                {
-                    data.map((obj) => <option id={obj.key} key={obj.key} value={obj.value}>{obj.value}</option>)
-                }
-            </select>
+            <Select className="form-control"
+                options={data}
+                value={defaultValue(data, props.selectedValue)}
+                onChange={e => { props.onChange(e); }}>
+            </Select>
         </div>)
 }
 

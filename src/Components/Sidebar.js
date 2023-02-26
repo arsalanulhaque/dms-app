@@ -20,7 +20,6 @@ function Sidebar() {
                 arr.push(o)
             }
         })
-        console.log(arr)
         setNav(arr)
     }, [setNav, session])
 

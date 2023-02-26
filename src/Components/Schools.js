@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
@@ -25,6 +25,16 @@ function Schools() {
         }
     }
 
+    const handleRowDelete = (message, alertType) => {
+        setMessage(message)
+        setAlertType(alertType)
+        setReload(true)
+    }
+
+    useEffect(() => {
+        setReload(false)
+    }, [])
+
     return (
         <>
             <Header />
@@ -42,7 +52,7 @@ function Schools() {
                             <SchoolsIU editRow={editRow} handleModalClosed={handleModalClosed} />
                         </div >
                         <div className="card-body">
-                            <Grid api='http://dms.admee.co.uk/school' editRow={editRowAction} reload={reloadGrid} />
+                            <Grid api='school' editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
                         </div>
                     </div>
                 </section>

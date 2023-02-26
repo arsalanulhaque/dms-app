@@ -7,31 +7,32 @@ import ModalBody from "react-bootstrap/ModalBody";
 import ModalFooter from "react-bootstrap/ModalFooter";
 import { useFormik } from "formik";
 import * as Yup from 'yup';
+import Dropdown from './Controls/Dropdown'
 import FetchData from '../Hooks/FetchData'
+import Alert from 'react-bootstrap/Alert';
 
 function SchoolsIU(props) {
     const [isVisible, setVisible] = useState(false)
+    const [message, setMessage] = useState('')
+    const [alertType, setAlertType] = useState('')
 
     const validationSchema = Yup.object().shape({
-        SchoolName: Yup.string()
-            .required('School name is required'),
-        Address: Yup.string()
-            .required('Address is required'),
+        SchoolName: Yup.string().required('School name is required'),
+        Address: Yup.string().required('Address is required'),
     });
 
     const formik = useFormik({
         initialValues: {
-            SchoolID: 0,
+            SchoolID: -1,
             SchoolName: "",
             Address: "",
         },
         validationSchema,
-        // validateOnChange: false,
-        // validateOnBlur: false,
+        validateOnChange: true,
+        validateOnBlur: false,
         onSubmit: (data) => {
-            console.log(JSON.stringify(data, null, 2));
             let httpMethod = props.editRow?.SchoolID > 0 ? 'put' : 'post'
-            let endpoint = 'http://dms.admee.co.uk/school'
+            let endpoint = 'school'
             let body = {
                 "school": {
                     "SchoolID": data.SchoolID,
@@ -42,7 +43,13 @@ function SchoolsIU(props) {
 
 
             FetchData(endpoint, httpMethod, body, (result) => {
-                hideModal('info', result)
+                if (!result.data.error) {
+                    hideModal(result?.data?.error === true ? 'danger' : 'success', result?.data?.message)
+                }
+                else {
+                    setAlertType('danger')
+                    setMessage(result.data.message)
+                }
             })
         },
 
@@ -50,18 +57,24 @@ function SchoolsIU(props) {
 
     useEffect(() => {
         if (props.editRow?.SchoolID > -1) {
+            showModal()
             formik.initialValues.SchoolID = props.editRow.SchoolID
             formik.initialValues.SchoolName = props.editRow.SchoolName
             formik.initialValues.Address = props.editRow.Address
-            showModal()
+        } else {
+            formik.initialValues.SchoolID = -1
+            formik.initialValues.SchoolName = ""
+            formik.initialValues.Address = ""
         }
-    }, [props])
+    }, [props, isVisible, formik, formik.initialValues])
 
     const showModal = () => {
         setVisible(true)
     };
 
     const hideModal = (alertType, msg) => {
+        formik.resetForm()
+        setMessage('')
         setVisible(false)
         props.handleModalClosed(msg, alertType, true);
     };
@@ -77,8 +90,10 @@ function SchoolsIU(props) {
                         <ModalTitle>{props.editRow?.SchoolID > -1 ? 'Update Existing' : 'Add New'} School</ModalTitle>
                     </ModalHeader>
                     <ModalBody>
-                        <div className="register-form">
-                            
+                        {message.length <= 0 ? null : <Alert key={alertType} variant={alertType}>
+                            {message}
+                        </Alert>}
+                        <div className="">
                             <div className="form-group">
                                 <label htmlFor="SchoolName">School Name</label>
                                 <input
@@ -106,20 +121,11 @@ function SchoolsIU(props) {
                                     {formik.errors.Address ? formik.errors.Address : null}
                                 </div>
                             </div>
-
-                            <div className="form-group">
-                                <button
-                                    type="button"
-                                    className="btn btn-warning float-right"
-                                    onClick={formik.handleReset}
-                                >
-                                    Reset
-                                </button>
-                            </div>
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        <button type="button" className="btn btn-secondary" onClick={() => hideModal('info', props.editRow?.SchoolID > -1 ? 'Edit action cancelled by user!' : 'Add action cancelled by user!')}>Cancel</button>
+                        <button type="reset" className="btn btn-warning" onClick={formik.handleReset}>Reset</button>
+                        <button type="button" className="btn btn-secondary" onClick={() => hideModal('info', 'Action cancelled by user!')}>Cancel</button>
                         <button type="submit" className="btn btn-primary">Save</button>
                     </ModalFooter>
                 </form>

@@ -1287,7 +1287,12 @@ div#submitForm input {
   color: #094ec5;
 }
 
-.spinner-big{
-  width: 15rem;
-  height: 15rem;
+.spinner-big {
+  width: 5rem;
+  height: 5rem;
+}
+
+.spinner-border {
+  --bs-spinner-border-width: 0.8em;
+  opacity: .5;
 }

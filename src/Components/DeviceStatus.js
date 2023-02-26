@@ -19,11 +19,8 @@ function DeviceStatus() {
                         <div className="col">
                             {/* <!--Content Start -- > */}
                             <div className="card">
-                                <div className='card-header'>
-                                    <DeviceStatusIU />
-                                </div>
                                 <div className="card-body">
-                                    <Grid api='http://dms.admee.co.uk/devicestatus/school' />
+                                    <Grid api='devicestatus/school' />
                                 </div>
                             </div>
                             {/* <!--Content End -- > */}

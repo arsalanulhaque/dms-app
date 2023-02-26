@@ -9,25 +9,24 @@ import { useFormik } from "formik";
 import * as Yup from 'yup';
 import Dropdown from './Controls/Dropdown'
 import FetchData from '../Hooks/FetchData'
+import Alert from 'react-bootstrap/Alert';
 
 function DeviceIU(props) {
     const [isVisible, setVisible] = useState(false)
+    const [message, setMessage] = useState('')
+    const [alertType, setAlertType] = useState('')
 
     const validationSchema = Yup.object().shape({
-        SchoolID: Yup.number().required('School is required'),
-        IMEI: Yup.string()
-            .required('IMEI is required'),
-        DeviceName: Yup.string()
-            .required('Device name is required'),
-        Model: Yup.string()
-            .required('Model is required'),
-        AssetID: Yup.string()
-            .required('Asset ID is required'),
+        SchoolID: Yup.number().min(1, 'School is required'),
+        IMEI: Yup.string().required('IMEI is required'),
+        DeviceName: Yup.string().required('Device name is required'),
+        Model: Yup.string().required('Model is required'),
+        AssetID: Yup.string().required('Asset ID is required'),
     });
 
     const formik = useFormik({
         initialValues: {
-            SchoolID: 0,
+            SchoolID: -1,
             IMEI: "",
             DeviceName: "",
             SchoolName: "",
@@ -36,27 +35,31 @@ function DeviceIU(props) {
             IsIssued: false
         },
         validationSchema,
-        // validateOnChange: false,
-        // validateOnBlur: false,
+        validateOnChange: true,
+        validateOnBlur: false,
         onSubmit: (data) => {
-            console.log(JSON.stringify(data, null, 2));
             let httpMethod = props.editRow?.DeviceID > 0 ? 'put' : 'post'
-            let endpoint = 'http://dms.admee.co.uk/device'
+            let endpoint = 'device'
             let body = {
                 "device": {
-                    "SchoolID": data.SchoolID,
+                    "DeviceID": props?.editRow?.DeviceID > 0 ? props?.editRow?.DeviceID : null,
+                    "SchoolID": formik.values.SchoolID,
                     "IMEI": data.IMEI,
                     "DeviceName": data.DeviceName,
                     "Model": data.Model,
                     "AssetID": data.AssetID,
                     "IsIssued": data.IsIssued === 'checked' ? 1 : 0,
-                    "DeviceID": props?.editRow?.DeviceID
                 }
             }
 
-
             FetchData(endpoint, httpMethod, body, (result) => {
-                hideModal('info', result)
+                if (!result.data.error) {
+                    hideModal(result?.data?.error === true ? 'danger' : 'success', result?.data?.message)
+                }
+                else {
+                    setAlertType('danger')
+                    setMessage(result.data.message)
+                }
             })
         },
 
@@ -64,29 +67,34 @@ function DeviceIU(props) {
 
     useEffect(() => {
         if (props.editRow?.DeviceID > -1) {
+            showModal()
             formik.initialValues.SchoolID = props.editRow.FKSchoolID
-            formik.initialValues.SchoolName = props.editRow.SchoolName
-            formik.initialValues.IMEI = props.editRow.IMEI
+            formik.initialValues.IMEI = props.editRow["MacAddress"]
             formik.initialValues.DeviceName = props.editRow.DeviceName
             formik.initialValues.Model = props.editRow.Model
             formik.initialValues.AssetID = props.editRow.AssetID
             formik.initialValues.IsIssued = props.editRow.IsIssued === 1 ? 'checked' : 'unchecked'
-            showModal()
+        } else {
+            formik.initialValues.SchoolID = -1
+            formik.initialValues.IMEI = ''
+            formik.initialValues.DeviceName = ''
+            formik.initialValues.Model = ''
+            formik.initialValues.AssetID = ''
+            formik.initialValues.IsIssued = 'unchecked'
         }
-    }, [props, formik.initialValues])
+    }, [formik, formik.initialValues, props, isVisible])
 
     const showModal = () => {
         setVisible(true)
-    };
+    }
 
     const hideModal = (alertType, msg) => {
+        formik.resetForm()
+        setMessage('')
         setVisible(false)
         props.handleModalClosed(msg, alertType, true);
-    };
-
-    const onSchoolChange = (e) => {
-        formik.initialValues.SchoolID = e.target.selectedOptions[0].id
     }
+
 
     return (
         <>
@@ -99,16 +107,18 @@ function DeviceIU(props) {
                         <ModalTitle>{props.editRow?.DeviceID > -1 ? 'Update Existing' : 'Add New'} Device</ModalTitle>
                     </ModalHeader>
                     <ModalBody>
-                        <div className="register-form">
-                            <div className="form-group">
+                        {message.length <= 0 ? null : <Alert key={alertType} variant={alertType}>
+                            {message}
+                        </Alert>}
+                        <div className="">
+                        <div className="form-group">
                                 <label htmlFor="SchoolID">School Name</label>
                                 <Dropdown name="SchoolID"
-                                    api="http://dms.admee.co.uk/school"
+                                    api="school"
                                     keyField='SchoolID'
                                     valueField='SchoolName'
-                                    type="Dropdown"
-                                    selectedValue={formik.values.SchoolName}
-                                    onChange={onSchoolChange}
+                                    selectedValue={formik.values.SchoolID}
+                                    onChange={value => formik.setFieldValue('SchoolID', value.value)}
                                 />
                                 <div className="text-danger">
                                     {formik.errors.SchoolID ? formik.errors.SchoolID : null}
@@ -116,7 +126,7 @@ function DeviceIU(props) {
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="IMEI"> IMEI </label>
+                                <label htmlFor="IMEI">Mac Address</label>
                                 <input
                                     name="IMEI"
                                     type="text"
@@ -185,17 +195,10 @@ function DeviceIU(props) {
                                     Device Issued Status
                                 </label>
                             </div>
-                            <div className="form-group">
-                                <button
-                                    type="reset"
-                                    className="btn btn-warning float-right"
-                                    onClick={ e => formik.resetForm()}>
-                                    Reset
-                                </button>
-                            </div>
                         </div>
                     </ModalBody>
                     <ModalFooter>
+                        <button type="reset" className="btn btn-warning" onClick={formik.resetForm}>Reset</button>
                         <button type="button" className="btn btn-secondary" onClick={() => hideModal('info', 'Action cancelled by user!')}>Cancel</button>
                         <button type="submit" className="btn btn-primary">Save</button>
                     </ModalFooter>
