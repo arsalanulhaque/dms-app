@@ -14,6 +14,13 @@ function Devices() {
 
     const editRowAction = (params) => {
         setEditRow(params.row)
+        setReload(false)
+    }
+
+    const handleModalOpen = (isOpen) => {
+        if (isOpen)
+            setReload(false)
+
     }
 
     const handleModalClosed = (message, alertType, isClosed) => {
@@ -31,10 +38,6 @@ function Devices() {
         setReload(true)
     }
 
-    useEffect(() => {
-        setReload(false)
-    }, [])
-
     return (
         <>
             <Header />
@@ -49,7 +52,7 @@ function Devices() {
                             <Alert key={alertType} variant={alertType}>
                                 {message}
                             </Alert>
-                            <DeviceIU editRow={editRow} handleModalClosed={handleModalClosed} />
+                            <DeviceIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen}/>
                         </div>
                         <div className="card-body">
                             <Grid api='device' editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />

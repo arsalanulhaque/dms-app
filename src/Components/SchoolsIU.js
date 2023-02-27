@@ -70,6 +70,7 @@ function SchoolsIU(props) {
 
     const showModal = () => {
         setVisible(true)
+        props.handleModalOpen(true);
     };
 
     const hideModal = (alertType, msg) => {

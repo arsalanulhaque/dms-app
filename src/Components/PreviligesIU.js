@@ -71,6 +71,7 @@ function PreviligesIU(props) {
 
     const showModal = () => {
         setVisible(true)
+        props.handleModalOpen(true);
     };
 
     const hideModal = (alertType, msg) => {
@@ -79,10 +80,6 @@ function PreviligesIU(props) {
         setVisible(false)
         props.handleModalClosed(msg, alertType, true);
     };
-
-    const onSchoolChange = (e) => {
-        formik.initialValues.SchoolID = e.target.selectedOptions[0].id
-    }
 
     return (
         <>

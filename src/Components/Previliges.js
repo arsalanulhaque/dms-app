@@ -17,6 +17,12 @@ function Previliges() {
         setReload(false)
     }
 
+    const handleModalOpen = (isOpen) => {
+        if (isOpen)
+            setReload(false)
+
+    }
+
     const handleModalClosed = (message, alertType, isClosed) => {
         if (isClosed) {
             setEditRow(null)
@@ -32,10 +38,6 @@ function Previliges() {
         setReload(true)
     }
 
-    useEffect(() => {
-        setReload(false)
-    }, [])
-
     return (
         <>
             <Header />
@@ -50,7 +52,7 @@ function Previliges() {
                             <Alert key={alertType} variant={alertType}>
                                 {message}
                             </Alert>
-                            <PreviligesIU editRow={editRow} handleModalClosed={handleModalClosed} />
+                            <PreviligesIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen}/>
                         </div>
                         <div className="card-body">
                             <Grid api='previlige' editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />

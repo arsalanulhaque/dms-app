@@ -15,6 +15,7 @@ const Grid = (props) => {
   const [reloadGrid, setReload] = useState(false)
 
   const handleDeleteClick = (id) => () => {
+    setReload(false)
     let endpoint = ''
     let body = {}
     switch (window.location.pathname) {
@@ -34,13 +35,16 @@ const Grid = (props) => {
         endpoint = 'users'
         body = { "UserID": id }
         break;
+      case '/manageactions':
+        endpoint = 'actions'
+        body = { "ActionID": id }
+        break;
       default:
         break;
     }
 
     FetchData(endpoint, 'delete', body, (result) => {
       props.deleteRow(result, 'success')
-      setReload(true)
     })
   }
 
@@ -67,8 +71,7 @@ const Grid = (props) => {
   }, [])
 
   useEffect(() => {
-    setReload(!props.reload)
-
+    setReload(props.reload)
     session.data.map((item) => {
       if (item.Link === window.location.pathname) {
         switch (item.ActionName) {
@@ -95,7 +98,7 @@ const Grid = (props) => {
 
       if (result.error === false) {
         result.data.map(obj => {
-          obj.id = obj?.DeviceID || obj?.DeviceStatusID || obj?.PreviligeID || obj?.SchoolID || obj?.UserID || obj?.PreviligeSchoolID
+          obj.id = obj?.DeviceID || obj?.DeviceStatusID || obj?.PreviligeID || obj?.SchoolID || obj?.UserID || obj?.PreviligeSchoolID || obj?.ActionID
         })
 
         if (result?.data?.length > 0) {
@@ -116,11 +119,16 @@ const Grid = (props) => {
               case 'DeviceStatusID':
               case 'PreviligeID':
               case 'PreviligeSchoolID':
+              case 'ActionID':
                 temp.headerName = 'ID'
                 temp.width = 70
                 break;
               case 'SchoolName':
                 temp.headerName = 'School Name'
+                temp.width = 350
+                break;
+              case 'ActionName':
+                temp.headerName = 'Action Name'
                 temp.width = 350
                 break;
               case 'Username':
@@ -228,6 +236,7 @@ const Grid = (props) => {
           experimentalFeatures={{ newEditingApi: true }}
         />
       </Box>
+      Reload: {reloadGrid === false ? 0 : 1}
     </Box >
   )
 }
