@@ -5,6 +5,7 @@ import Register from './Pages/Register'
 import Dashboard from './Pages/Dashboard'
 import Search from './Pages/Search'
 
+import Actions from './Components/Actions';
 import Devices from './Components/Devices';
 import DeviceStatus from './Components/DeviceStatus';
 import Previliges from './Components/Previliges';
@@ -39,6 +40,8 @@ function AppWrapper() {
                 <Route path='/managepreviliges' element={<Previliges />} />
                 <Route path='/manageschools' element={<Schools />} />
                 <Route path='/manageusers' element={<Users />} />
+                <Route path='/manageusers' element={<Users />} />
+                <Route path='/manageactions' element={<Actions />} />
                 
               </Routes>
             </BrowserRouter>
