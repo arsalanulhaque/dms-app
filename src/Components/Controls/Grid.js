@@ -39,6 +39,10 @@ const Grid = (props) => {
         endpoint = 'actions'
         body = { "ActionID": id }
         break;
+      case '/managemenus':
+        endpoint = 'menus'
+        body = { "MenuID": id }
+        break;
       default:
         break;
     }
@@ -98,7 +102,7 @@ const Grid = (props) => {
 
       if (result.error === false) {
         result.data.map(obj => {
-          obj.id = obj?.DeviceID || obj?.DeviceStatusID || obj?.PreviligeID || obj?.SchoolID || obj?.UserID || obj?.PreviligeSchoolID || obj?.ActionID
+          obj.id = obj?.DeviceID || obj?.DeviceStatusID || obj?.PreviligeID || obj?.SchoolID || obj?.UserID || obj?.PreviligeSchoolID || obj?.ActionID || obj?.MenuID
         })
 
         if (result?.data?.length > 0) {
@@ -120,11 +124,16 @@ const Grid = (props) => {
               case 'PreviligeID':
               case 'PreviligeSchoolID':
               case 'ActionID':
+              case 'MenuID':
                 temp.headerName = 'ID'
                 temp.width = 70
                 break;
               case 'SchoolName':
                 temp.headerName = 'School Name'
+                temp.width = 350
+                break;
+              case 'URL':
+                temp.headerName = 'URL'
                 temp.width = 350
                 break;
               case 'ActionName':
@@ -133,6 +142,10 @@ const Grid = (props) => {
                 break;
               case 'Username':
                 temp.headerName = 'User Name'
+                temp.width = 200
+                break;
+              case 'MenuName':
+                temp.headerName = 'Menu Name'
                 temp.width = 200
                 break;
               case 'Address':
@@ -185,20 +198,18 @@ const Grid = (props) => {
           })
 
           if (window.location.pathname !== '/managedevicestatus') {
-            _columns.push(
-              {
-                field: 'actions',
-                headerName: 'Actions',
-                type: 'actions',
+            _columns.push({
+              field: 'actions',
+              headerName: 'Actions',
+              type: 'actions',
 
-                flex: 1,
-                minWidth: 80,
-                align: "right",
-                headerAlign: 'right',
+              flex: 1,
+              minWidth: 80,
+              align: "right",
+              headerAlign: 'right',
 
-                getActions: (params) => addActionCols(params)
-              }
-            )
+              getActions: (params) => addActionCols(params)
+            })
           }
           setRows(result.data)
           setColumns(_columns)

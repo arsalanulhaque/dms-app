@@ -6,6 +6,7 @@ import Dashboard from './Pages/Dashboard'
 import Search from './Pages/Search'
 
 import Actions from './Components/Actions';
+import Menus from './Components/Menus';
 import Devices from './Components/Devices';
 import DeviceStatus from './Components/DeviceStatus';
 import Previliges from './Components/Previliges';
@@ -42,6 +43,7 @@ function AppWrapper() {
                 <Route path='/manageusers' element={<Users />} />
                 <Route path='/manageusers' element={<Users />} />
                 <Route path='/manageactions' element={<Actions />} />
+                <Route path='/managemenus' element={<Menus />} />
                 
               </Routes>
             </BrowserRouter>
