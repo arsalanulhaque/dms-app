@@ -59,7 +59,7 @@ function MenusIU(props) {
             showModal()
             formik.initialValues.MenuID = props.editRow.MenuID
             formik.initialValues.MenuName = props.editRow.MenuName
-            formik.initialValues.Url = props.editRow.Url
+            formik.initialValues.Url = props.editRow.URL
             formik.initialValues.Icon = props.editRow.Icon
         } else {
             formik.initialValues.MenuID = -1

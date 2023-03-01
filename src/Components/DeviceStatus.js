@@ -2,9 +2,12 @@
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
-import DeviceStatusIU from './DeviceStatusIU'
+import SessionContext from '../Context/SessionContext'
+import React, { useContext } from 'react';
 
 function DeviceStatus() {
+    const { session } = useContext(SessionContext);
+
     return (
         <>
             <Header />
@@ -20,7 +23,7 @@ function DeviceStatus() {
                             {/* <!--Content Start -- > */}
                             <div className="card">
                                 <div className="card-body">
-                                    <Grid api='devicestatus/school' />
+                                    <Grid api={session.isSuperAdmin ? 'devicestatus' : 'devicestatus/school'} />
                                 </div>
                             </div>
                             {/* <!--Content End -- > */}

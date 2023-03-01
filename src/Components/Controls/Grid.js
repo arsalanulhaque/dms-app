@@ -43,6 +43,10 @@ const Grid = (props) => {
         endpoint = 'menus'
         body = { "MenuID": id }
         break;
+      case '/managepolicies':
+        endpoint = 'policy'
+        body = { "PreviligeMenuActionsID": id }
+        break;
       default:
         break;
     }
@@ -102,7 +106,7 @@ const Grid = (props) => {
 
       if (result.error === false) {
         result.data.map(obj => {
-          obj.id = obj?.DeviceID || obj?.DeviceStatusID || obj?.PreviligeID || obj?.SchoolID || obj?.UserID || obj?.PreviligeSchoolID || obj?.ActionID || obj?.MenuID
+          obj.id = obj?.DeviceID || obj?.DeviceStatusID || obj?.PreviligeID || obj?.SchoolID || obj?.UserID || obj?.PreviligeSchoolID || obj?.ActionID || obj?.MenuID || obj.PreviligeMenuActionsID
         })
 
         if (result?.data?.length > 0) {
@@ -125,6 +129,7 @@ const Grid = (props) => {
               case 'PreviligeSchoolID':
               case 'ActionID':
               case 'MenuID':
+              case 'PreviligeMenuActionsID':
                 temp.headerName = 'ID'
                 temp.width = 70
                 break;
@@ -227,6 +232,8 @@ const Grid = (props) => {
               columnVisibilityModel: {
                 // Hide columns status and traderName, the other columns will remain visible
                 FKPreviligeID: false,
+                FKPreviligeMenuID: false,
+                FKPreviligeActionID: false,
                 FKSchoolID: false,
                 FKDeviceStatusID: false,
                 FKUserID: false,

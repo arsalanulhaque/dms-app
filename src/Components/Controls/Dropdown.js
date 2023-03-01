@@ -8,6 +8,15 @@ function Dropdown(props) {
     const [data, setData] = useState([])
     const { session } = useContext(SessionContext);
 
+    let formatOptionLabel = ({ value, label, labelSchool }) => (
+        <div style={{ display: "flex" }}>
+            <div>{label}</div>
+            <div style={{ marginLeft: "10px", color: "#ccc" }}>
+                {labelSchool}
+            </div>
+        </div>
+    );
+
     useEffect(() => {
         $(function () {
             $('div.form-control').removeClass("form-control")
@@ -19,7 +28,11 @@ function Dropdown(props) {
             if (result.error === false) {
                 let res = result
                 res.data.map(obj => {
-                    options.push({ value: obj[props.keyField], label: obj[props.valueField] })
+                    if (props.api === 'previlige')
+                        options.push({ value: obj[props.keyField], label: obj[props.valueField], labelSchool: obj.SchoolName })
+                    else
+                        options.push({ value: obj[props.keyField], label: obj[props.valueField] })
+
                 })
                 setData(options)
             }
@@ -35,6 +48,7 @@ function Dropdown(props) {
             <Select className="form-control"
                 options={data}
                 value={defaultValue(data, props.selectedValue)}
+                {...props.api === 'previlige' ? formatOptionLabel = { formatOptionLabel } : ''}
                 onChange={e => { props.onChange(e); }}>
             </Select>
         </div>)
