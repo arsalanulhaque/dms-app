@@ -24,7 +24,7 @@ function Dropdown(props) {
 
         let options = [{ value: -1, label: 'Select' }]
 
-        FetchData(session.isSuperAdmin ? props.api : `${props.api}/${session.schoolID}`, 'get', null, (result) => {
+        FetchData(session.isAppDeveloper === true ? props.api : `${props.api}/${session.schoolID}`, 'get', null, (result) => {
             if (result.error === false) {
                 let res = result
                 res.data.map(obj => {

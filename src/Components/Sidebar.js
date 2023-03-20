@@ -6,6 +6,10 @@ import iconUser from '../assets/img/user.png'
 import iconSchool from '../assets/img/school.png'
 import iconPrevilige from '../assets/img/previlige.png'
 import iconDevice from '../assets/img/devices.png'
+import iconAction from '../assets/img/actions.png'
+import iconMenu from '../assets/img/menus.png'
+import iconPolicy from '../assets/img/policies.png'
+
 
 function Sidebar() {
     const { session } = useContext(SessionContext)
@@ -36,7 +40,11 @@ function Sidebar() {
                                         <img src={item.Icon === 'user' ? iconUser :
                                             item.Icon === 'previlige' ? iconPrevilige :
                                                 item.Icon === 'devices' ? iconDevice :
-                                                    item.Icon === 'school' ? iconSchool : ''} height='30' />
+                                                    item.Icon === 'school' ? iconSchool :
+                                                    item.Icon === 'actions' ? iconAction :
+                                                    item.Icon === 'menus' ? iconMenu :
+                                                    item.Icon === 'policies' ? iconPolicy :
+                                                    item.Icon === 'status' ? iconStatus : ''} height='30' />
                                     </i>
                                     <span>{item.MenuName}</span>
 

@@ -6,6 +6,7 @@ import { Box } from '@mui/system';
 import FetchData from '../../Hooks/FetchData'
 import SessionContext from '../../Context/SessionContext'
 
+
 const Grid = (props) => {
   const { session } = useContext(SessionContext);
 
@@ -102,7 +103,7 @@ const Grid = (props) => {
       }
     })
 
-    FetchData(session.isSuperAdmin ? props.api : `${props.api}/${session.schoolID}`, 'get', null, (result) => {
+    FetchData(session.isAppDeveloper === true ? props.api : `${props.api}/${session.schoolID}`, 'get', null, (result) => {
 
       if (result.error === false) {
         result.data.map(obj => {

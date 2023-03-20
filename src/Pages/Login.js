@@ -44,10 +44,11 @@ function Login() {
                     session.data = result.data.data
                     session.error = result.data.error
                     session.isAdmin = result.data.data[0].PreviligeName === 'Admin' ? true : false
-                    session.isSuperAdmin = result.data.data[0].PreviligeName === 'Super Admin' ? true : false
+                    session.isAppDeveloper = result.data.data[0].PreviligeName ===  'AppDeveloper' ? true : false
+                    //session.isSuperAdmin = result.data.data[0].PreviligeName === 'Super Admin' ? true : false
                     session.schoolID = result.data.data[0].SchoolID
                     session.userID = result.data.data[0].UserID
-                    navigate(session.isAdmin || session.isSuperAdmin === true ? '/dashboard' : '/search')
+                    navigate(result.data.data[0].PreviligeName === 'Staff' ? '/search' : '/dashboard')
                 }
             })
         },
