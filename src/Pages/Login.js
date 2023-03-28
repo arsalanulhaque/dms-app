@@ -48,6 +48,7 @@ function Login() {
                     //session.isSuperAdmin = result.data.data[0].PreviligeName === 'Super Admin' ? true : false
                     session.schoolID = result.data.data[0].SchoolID
                     session.userID = result.data.data[0].UserID
+                    session.emailID = result.data.data[0].EmailID
                     navigate(result.data.data[0].PreviligeName === 'Staff' ? '/search' : '/dashboard')
                 }
             })

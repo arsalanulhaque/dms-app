@@ -54,6 +54,8 @@ function Search() {
                 DeviceID: prod.DeviceID,
                 SchoolID: session.schoolID,
                 UserID: session.userID,
+                EmailID: session.emailID,
+                AssetID: prod.assetID
             }
         }
 
@@ -76,6 +78,8 @@ function Search() {
                 DeviceStatusID: prod.FKDeviceStatusID,
                 SchoolID: session.schoolID,
                 UserID: session.userID,
+                EmailID: session.emailID,
+                AssetID: prod.assetID
             }
         }
 
@@ -97,7 +101,9 @@ function Search() {
             "device": {
                 DeviceID: prod.DeviceID,
                 SchoolID: session.schoolID,
-                IsIssued: isIssued
+                IsIssued: isIssued,
+                EmailID: session.emailID,
+                AssetID: prod.assetID
             }
         }
 
@@ -130,11 +136,9 @@ function Search() {
                 else {
                     setAlertType('danger')
                     setMessage("Something wrong went!")
-
                 }
                 setLoader(false)
             }, 3000);
-
         }
     }
 
@@ -220,10 +224,10 @@ function Search() {
                                                     </div>
                                                     <div className="col-5">
                                                         {prod.IsIssued === 0 ? <span className="btn-bookNow fs-6 float-end fw-bold text-warning" onClick={() => onBookDevice(prod)}>Book Now</span> : ''}
-                                                        {prod.IsIssued === 1 && prod.FKUserID !== session.UserID ?
-                                                            <span className="btn-bookNow fs-6 float-end fw-bold text-danger" onClick={() => onReturnDevice(prod)}>Return Now</span> :
-                                                            prod.IsIssued === 1 && prod.FKDeviceStatusID === prod.DeviceID ?
-                                                                <span className="btn-already-booked fs-6 float-end fw-bold">Already Booked</span> : ''}
+                                                        {prod.IsIssued === 1 && prod.FKUserID === session.userID ?
+                                                            <span className="btn-bookNow fs-6 float-end fw-bold text-danger" onClick={() => onReturnDevice(prod)}>Return Now</span> : ''}
+                                                        {prod.IsIssued === 1 && prod.FKUserID !== session.userID  ?
+                                                            <span className="btn-already-booked fs-6 float-end fw-bold">Already Booked</span> : ''}
                                                     </div>
                                                 </div>
                                                 <div className="row">

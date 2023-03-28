@@ -9,6 +9,8 @@ import iconDevice from '../assets/img/devices.png'
 import iconAction from '../assets/img/actions.png'
 import iconMenu from '../assets/img/menus.png'
 import iconPolicy from '../assets/img/policies.png'
+import iconStatus from '../assets/img/status.png'
+
 
 
 function Sidebar() {
