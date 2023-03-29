@@ -3,7 +3,7 @@ import axios from 'axios';
 const FetchData = async (endpoint, method, body, callback) => {
   try {
     let response = null
-    endpoint = 'http://dms.admee.co.uk:8000//' + endpoint
+    endpoint = 'http://dms.admee.co.uk:8000/' + endpoint
     switch (method) {
       case 'get':
         response = await axios.get(endpoint);
