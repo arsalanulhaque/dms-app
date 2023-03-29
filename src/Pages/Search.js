@@ -55,7 +55,7 @@ function Search() {
                 SchoolID: session.schoolID,
                 UserID: session.userID,
                 EmailID: session.emailID,
-                AssetID: prod.assetID
+                AssetID: prod.AssetID
             }
         }
 
@@ -79,7 +79,7 @@ function Search() {
                 SchoolID: session.schoolID,
                 UserID: session.userID,
                 EmailID: session.emailID,
-                AssetID: prod.assetID
+                AssetID: prod.AssetID
             }
         }
 
@@ -103,7 +103,7 @@ function Search() {
                 SchoolID: session.schoolID,
                 IsIssued: isIssued,
                 EmailID: session.emailID,
-                AssetID: prod.assetID
+                AssetID: prod.AssetID
             }
         }
 
