@@ -17,10 +17,14 @@ function UsersIU(props) {
     const [alertType, setAlertType] = useState('')
 
     const validationSchema = Yup.object().shape({
-        SchoolID: Yup.number().min(1, 'School is required'),
-        EmailID: Yup.string().required('Email is required').email("Email is invalid"),
+        FirstName: Yup.string().required('First Name is required'),
+        LastName: Yup.string().required('Last Name is required'),
+
         Username: Yup.string().required('User name is required').matches(new RegExp('^\'?\\p{L}+(?:[0-9])*[\' ]?$', 'gmu'), 'Special charactes are not allowed!'),
         Password: Yup.string().required('Password is required'),
+        EmailID: Yup.string().required('Email is required').email("Email is invalid"),
+
+        SchoolID: Yup.number().min(1, 'School is required'),
         PreviligeID: Yup.number().min(1, 'Previlige is required'),
     });
 
@@ -32,6 +36,9 @@ function UsersIU(props) {
             EmailID: "",
             Username: "",
             Password: "",
+            FirstName: "",
+            LastName: "",
+            NfcID: "",
         },
         validationSchema: validationSchema,
         validateOnChange: true,
@@ -42,11 +49,14 @@ function UsersIU(props) {
             let body = {
                 "user": {
                     "UserID": props?.editRow?.UserID > 0 ? props?.editRow?.UserID : null,
+                    "FirstName": formik.values.FirstName,
+                    "LastName": formik.values.LastName,
                     "SchoolID": formik.values.SchoolID,
                     "PreviligeID": formik.values.PreviligeID,
                     "EmailID": data.EmailID,
                     "Password": data.Password,
                     "Username": data.Username,
+                    "NfcID": data.NfcID,
                 }
             }
 
@@ -72,13 +82,19 @@ function UsersIU(props) {
             formik.initialValues.EmailID = props?.editRow?.EmailID || ''
             formik.initialValues.Username = props?.editRow?.Username || ''
             formik.initialValues.Password = props?.editRow?.Password || ''
+            formik.initialValues.NfcID = props?.editRow?.NfcID || ''
+            formik.initialValues.FirstName = props?.editRow?.FirstName || ''
+            formik.initialValues.LastName = props?.editRow?.LastName || ''
         } else {
             formik.initialValues.UserID = -1
             formik.initialValues.SchoolID = -1
             formik.initialValues.PreviligeID = -1
             formik.initialValues.EmailID = ""
+            formik.initialValues.FirstName = ""
+            formik.initialValues.LastName = ""
             formik.initialValues.Username = ""
             formik.initialValues.Password = ""
+            formik.initialValues.NfcID = ""
         }
     }, [props, isVisible, formik, formik.initialValues])
 
@@ -124,6 +140,48 @@ function UsersIU(props) {
                             </div>
 
                             <div className="form-group">
+                                <label htmlFor="FirstName">First Name</label>
+                                <input
+                                    name="FirstName"
+                                    type="text"
+                                    className="form-control"
+                                    onChange={formik.handleChange}
+                                    value={formik.values.FirstName}
+                                />
+                                <div className="text-danger">
+                                    {formik.errors.FirstName ? formik.errors.FirstName : null}
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="LastName">Last Name</label>
+                                <input
+                                    name="LastName"
+                                    type="text"
+                                    className="form-control"
+                                    onChange={formik.handleChange}
+                                    value={formik.values.LastName}
+                                />
+                                <div className="text-danger">
+                                    {formik.errors.LastName ? formik.errors.LastName : null}
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="Username">User Name</label>
+                                <input
+                                    name="Username"
+                                    type="text"
+                                    className="form-control"
+                                    onChange={formik.handleChange}
+                                    value={formik.values.Username}
+                                />
+                                <div className="text-danger">
+                                    {formik.errors.Username ? formik.errors.Username : null}
+                                </div>
+                            </div>
+
+                            <div className="form-group">
                                 <label htmlFor="Username">User Name</label>
                                 <input
                                     name="Username"
@@ -162,6 +220,20 @@ function UsersIU(props) {
                                     autoComplete="new-password" />
                                 <div className="text-danger">
                                     {formik.errors.Password ? formik.errors.Password : null}
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="NfcID">NfcID</label>
+                                <input
+                                    name="NfcID"
+                                    type="password"
+                                    className="form-control"
+                                    onChange={formik.handleChange}
+                                    value={formik.values.NfcID}
+                                />
+                                <div className="text-danger">
+                                    {formik.errors.NfcID ? formik.errors.NfcID : null}
                                 </div>
                             </div>
 

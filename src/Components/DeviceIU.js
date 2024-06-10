@@ -23,6 +23,7 @@ function DeviceIU(props) {
         DeviceName: Yup.string().required('Device name is required'),
         Model: Yup.string().required('Model is required'),
         AssetID: Yup.string().required('Asset ID is required'),
+        BarCode:Yup.string().min(6,'Minimum 6 characters long Bar Code are allowed')
     });
 
     const formik = useFormik({
@@ -33,6 +34,7 @@ function DeviceIU(props) {
             SchoolName: "",
             Model: "",
             AssetID: "",
+            BarCode: "",
             IsIssued: false
         },
         validationSchema,
@@ -49,6 +51,7 @@ function DeviceIU(props) {
                     "DeviceName": data.DeviceName,
                     "Model": data.Model,
                     "AssetID": data.AssetID,
+                    "BarCode": data.BarCode,
                     "IsIssued": data.IsIssued === 'checked' ? 1 : 0,
                 }
             }
@@ -74,6 +77,7 @@ function DeviceIU(props) {
             formik.initialValues.DeviceName = props.editRow.DeviceName
             formik.initialValues.Model = props.editRow.Model
             formik.initialValues.AssetID = props.editRow.AssetID
+            formik.initialValues.BarCode = props.editRow.BarCode
             formik.initialValues.IsIssued = props.editRow.IsIssued === 1 ? 'checked' : 'unchecked'
         } else {
             formik.initialValues.SchoolID = -1
@@ -81,6 +85,7 @@ function DeviceIU(props) {
             formik.initialValues.DeviceName = ''
             formik.initialValues.Model = ''
             formik.initialValues.AssetID = ''
+            formik.initialValues.BarCode = ''
             formik.initialValues.IsIssued = 'unchecked'
         }
     }, [formik, formik.initialValues, props, isVisible])
@@ -113,7 +118,7 @@ function DeviceIU(props) {
                             {message}
                         </Alert>}
                         <div className="">
-                        <div className="form-group">
+                            <div className="form-group">
                                 <label htmlFor="SchoolID">School Name</label>
                                 <Dropdown name="SchoolID"
                                     api="school"
@@ -181,6 +186,22 @@ function DeviceIU(props) {
                                 <div className="text-danger">
                                     {formik.errors.AssetID
                                         ? formik.errors.AssetID
+                                        : null}
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="BarCode"> Bar Code </label>
+                                <input
+                                    name="BarCode"
+                                    type="text"
+                                    className="form-control"
+                                    onChange={formik.handleChange}
+                                    value={formik.values.BarCode}
+                                />
+                                <div className="text-danger">
+                                    {formik.errors.BarCode
+                                        ? formik.errors.BarCode
                                         : null}
                                 </div>
                             </div>

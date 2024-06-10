@@ -14,7 +14,7 @@ function DeviceStatus() {
             <Sidebar />
             <main id="main" className="main">
                 <div className="pagetitle">
-                    <h1>Manage Device Status</h1>
+                    <h1>Device History</h1>
                 </div>
                 {/* <!-- End Page Title --> */}
                 <section className="section">
@@ -23,7 +23,7 @@ function DeviceStatus() {
                             {/* <!--Content Start -- > */}
                             <div className="card">
                                 <div className="card-body">
-                                    <Grid api={session.isSuperAdmin ? 'devicestatus' : 'devicestatus/school'} />
+                                    <Grid api={session.isAppDeveloper === true ? `devicestatus` : `devicestatus/school/${session.schoolID}`} />
                                 </div>
                             </div>
                             {/* <!--Content End -- > */}

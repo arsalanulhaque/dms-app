@@ -10,6 +10,7 @@ import iconAction from '../assets/img/actions.png'
 import iconMenu from '../assets/img/menus.png'
 import iconPolicy from '../assets/img/policies.png'
 import iconStatus from '../assets/img/status.png'
+import iconHome from '../assets/img/home.png'
 
 
 
@@ -46,6 +47,7 @@ function Sidebar() {
                                                     item.Icon === 'actions' ? iconAction :
                                                     item.Icon === 'menus' ? iconMenu :
                                                     item.Icon === 'policies' ? iconPolicy :
+                                                    item.Icon === 'home' ? iconHome :
                                                     item.Icon === 'status' ? iconStatus : ''} height='30' />
                                     </i>
                                     <span>{item.MenuName}</span>

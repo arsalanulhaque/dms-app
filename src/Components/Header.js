@@ -36,7 +36,7 @@ function Header() {
                                 <hr className="dropdown-divider" />
                             </li>
 
-                            <li>
+                            {/* <li>
                                 <a className="dropdown-item d-flex align-items-center" href="users-profile.html">
                                     <i className="bi bi-person"></i>
                                     <span>My Profile</span>
@@ -64,7 +64,7 @@ function Header() {
                             </li>
                             <li>
                                 <hr className="dropdown-divider" />
-                            </li>
+                            </li> */}
 
                             <li>
                                 <Link to='/Login' className="dropdown-item d-flex align-items-center">

@@ -1,4 +1,4 @@
-import Login from '../Pages/Login'
+import Login from '../Pages/AdminLogin'
 import Dashboard from '../Pages/Dashboard'
 import Home from '../Pages/Search'
 import DeviceStatus from '../Components/DeviceStatus'

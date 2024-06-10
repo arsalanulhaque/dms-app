@@ -1,12 +1,14 @@
 
-import { useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
 import UsersIU from './UsersIU'
 import Alert from 'react-bootstrap/Alert';
+import SessionContext from '../Context/SessionContext'
 
 function Users() {
+    const { session } = useContext(SessionContext);
     const [editRow, setEditRow] = useState({})
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -55,7 +57,7 @@ function Users() {
                             <UsersIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen} />
                         </div>
                         <div className="card-body">
-                            <Grid api='users' editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
+                            <Grid api={session.isAppDeveloper === true ? `users` : `users/${session.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
                         </div>
                     </div>
                 </section>

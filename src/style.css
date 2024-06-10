@@ -1296,3 +1296,13 @@ div#submitForm input {
   --bs-spinner-border-width: 0.8em;
   opacity: .5;
 }
+
+.hidden-form-control,
+.hidden-form-control:focus{
+  border-color: transparent;
+  background-color: transparent;
+  cursor: none;
+  outline: none;
+  caret-color: transparent;
+  color: transparent;
+}

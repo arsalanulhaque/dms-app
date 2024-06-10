@@ -9,7 +9,6 @@ import SessionContext from '../../Context/SessionContext'
 
 const Grid = (props) => {
   const { session } = useContext(SessionContext);
-
   const [rows, setRows] = useState([])
   const [columns, setColumns] = useState([])
   const permissions = useRef({ create: false, update: false, delete: false, retrieve: false })
@@ -103,7 +102,7 @@ const Grid = (props) => {
       }
     })
 
-    FetchData(session.isAppDeveloper === true ? props.api : `${props.api}/${session.schoolID}`, 'get', null, (result) => {
+    FetchData( props.api, 'get', null, (result) => {
 
       if (result.error === false) {
         result.data.map(obj => {
@@ -134,6 +133,7 @@ const Grid = (props) => {
                 temp.headerName = 'ID'
                 temp.width = 70
                 break;
+                
               case 'SchoolName':
                 temp.headerName = 'School Name'
                 temp.width = 350
@@ -148,6 +148,14 @@ const Grid = (props) => {
                 break;
               case 'Username':
                 temp.headerName = 'User Name'
+                temp.width = 200
+                break;
+              case 'FirstName':
+                temp.headerName = 'First Name'
+                temp.width = 200
+                break;
+              case 'LastName':
+                temp.headerName = 'Last Name'
                 temp.width = 200
                 break;
               case 'MenuName':
@@ -191,6 +199,10 @@ const Grid = (props) => {
               case 'UserSchoolID':
                 temp.headerName = 'UserSchoolID'
                 temp.width = 1
+                break;
+              case 'NfcID':
+                temp.headerName = 'NFC ID'
+                temp.width = 200
                 break;
               case 'UserPreviligeID':
                 temp.headerName = 'UserPreviligeID'
