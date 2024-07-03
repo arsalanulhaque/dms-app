@@ -208,13 +208,13 @@ function DeviceIU(props) {
 
                             <div className="form-group form-check">
                                 <input
-                                    name="Issued"
+                                    name="IsIssued"
                                     type="checkbox"
                                     className="form-check-input"
                                     onChange={formik.handleChange}
                                     checked={formik.values.IsIssued}
                                 />
-                                <label htmlFor="Issued" className="form-check-label">
+                                <label htmlFor="IsIssued" className="form-check-label">
                                     Device Issued Status
                                 </label>
                             </div>

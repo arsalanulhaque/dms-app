@@ -74,13 +74,13 @@ function Login() {
                                     />
                                 </div>
                                 {
-                                alertType ==='danger'? 
-                                <div className="card-footer">
-                                    <Alert key={alertType} variant={alertType}>
-                                        {message}
-                                    </Alert>
-                                </div>
-                                :<></>
+                                    alertType === 'danger' ?
+                                        <div className="card-footer">
+                                            <Alert key={alertType} variant={alertType}>
+                                                {message}
+                                            </Alert>
+                                        </div>
+                                        : <></>
                                 }
                             </div>
                         </div>
