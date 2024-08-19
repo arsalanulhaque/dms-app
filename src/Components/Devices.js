@@ -4,7 +4,7 @@ import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
 import DeviceIU from './DeviceIU';
 import Alert from 'react-bootstrap/Alert';
-import SessionContext from '../Context/SessionContext'
+import { SessionContext} from '../Context/SessionContext'
 
 function Devices() {
     const { session } = useContext(SessionContext);
@@ -44,23 +44,30 @@ function Devices() {
             <Header />
             <Sidebar />
             <main id="main" className="main">
-                <div className="pagetitle">
-                    <h1>Manage Devices</h1>
-                </div>
+
                 <section className="section">
                     <div className="card">
                         <div className="card-header">
-                            <Alert key={alertType} variant={alertType}>
+                            <div className='row mb-2'>
+                                <div className='col'>
+                                    <div className="pagetitle">
+                                        <h1>Manage Devices</h1>
+                                    </div>
+                                </div>
+                                <div className='col'>
+                                    <DeviceIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen} />
+                                </div>
+                            </div>
+                            <Alert className='m-0 p-2' key={alertType} variant={alertType}>
                                 {message}
                             </Alert>
-                            <DeviceIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen}/>
                         </div>
                         <div className="card-body">
                             <Grid api={session.isAppDeveloper === true ? `device` : `device/${session.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
                         </div>
                     </div>
                 </section>
-            </main>
+            </main >
         </>
     )
 }

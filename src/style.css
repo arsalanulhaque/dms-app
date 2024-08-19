@@ -234,7 +234,7 @@ h6 {
 
 /* Card */
 .card {
-  margin-bottom: 30px;
+  
   border: none;
   border-radius: 5px;
   box-shadow: 0px 0 30px rgba(1, 41, 112, 0.1);
@@ -1260,7 +1260,7 @@ h6 {
 }
 
 .search {
-  margin-top: 6%;
+  margin-top: 2%;
 }
 
 div#submitForm input {
@@ -1305,4 +1305,27 @@ div#submitForm input {
   outline: none;
   caret-color: transparent;
   color: transparent;
+}
+
+.icon{
+  width: 24px;
+  height: 24px;
+}
+
+.icon-28{
+  width: 28px;
+  height: 28px;
+}
+
+.icon-48{
+  width: 48px;
+}
+
+.dim >*{
+  background-color: #e4e4e4;
+}
+
+.fill .map 
+{
+  min-height: 70vh;
 }

@@ -21,7 +21,7 @@ function Menus() {
         if (isOpen)
             setReload(false)
     }
-    
+
     const handleModalClosed = (message, alertType, isClosed) => {
         if (isClosed) {
             setEditRow(null)
@@ -42,16 +42,23 @@ function Menus() {
             <Header />
             <Sidebar />
             <main id="main" className="main">
-                <div className="pagetitle">
-                    <h1>Manage Menus</h1>
-                </div>
+
                 <section className="section">
                     <div className="card">
                         <div className="card-header">
-                            <Alert key={alertType} variant={alertType}>
+                            <div className='row mb-2'>
+                                <div className='col'>
+                                    <div className="pagetitle">
+                                        <h1>Manage Menus</h1>
+                                    </div>
+                                </div>
+                                <div className='col'>
+                                    <MenusIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen} />
+                                </div>
+                            </div>
+                            <Alert className='m-0 p-2' key={alertType} variant={alertType}>
                                 {message}
                             </Alert>
-                            <MenusIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen}/>
                         </div >
                         <div className="card-body">
                             <Grid api='Menus' editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
@@ -59,7 +66,8 @@ function Menus() {
                     </div>
                 </section>
             </main>
-        </>);
+        </>
+    )
 }
 
 export default Menus;

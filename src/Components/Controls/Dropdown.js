@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import FetchData from '../../Hooks/FetchData'
-import SessionContext from '../../Context/SessionContext'
+import { SessionContext} from '../../Context/SessionContext'
 import Select from 'react-select'
 import $ from "jquery";
 
@@ -23,12 +23,12 @@ function Dropdown(props) {
         })
 
         let options = [{ value: -1, label: 'Select' }]
-
-        FetchData(session.isAppDeveloper === true ? props.api : `${props.api}/${session.schoolID}`, 'get', null, (result) => {
+        //session.isAppDeveloper === true ? props.api : `${props.api}/${session.schoolID}`
+        FetchData(props.api, 'get', null, (result) => {
             if (result.error === false) {
                 let res = result
                 res.data.map(obj => {
-                    if (props.api === 'previlige')
+                    if (props.keyField === 'PreviligeID')
                         options.push({ value: obj[props.keyField], label: obj[props.valueField], labelSchool: obj.SchoolName })
                     else
                         options.push({ value: obj[props.keyField], label: obj[props.valueField] })

@@ -4,7 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box } from '@mui/system';
 import FetchData from '../../Hooks/FetchData'
-import SessionContext from '../../Context/SessionContext'
+import { SessionContext} from '../../Context/SessionContext'
 
 
 const Grid = (props) => {
@@ -102,7 +102,7 @@ const Grid = (props) => {
       }
     })
 
-    FetchData( props.api, 'get', null, (result) => {
+    FetchData(props.api, 'get', null, (result) => {
 
       if (result.error === false) {
         result.data.map(obj => {
@@ -133,7 +133,7 @@ const Grid = (props) => {
                 temp.headerName = 'ID'
                 temp.width = 70
                 break;
-                
+
               case 'SchoolName':
                 temp.headerName = 'School Name'
                 temp.width = 350
@@ -208,6 +208,7 @@ const Grid = (props) => {
                 temp.headerName = 'UserPreviligeID'
                 temp.width = 1
                 break;
+
               default:
                 break;
             }
@@ -237,7 +238,6 @@ const Grid = (props) => {
 
   }, [props.api, props.reload, reloadGrid, addActionCols, rows?.length, session.data, session.isSuperAdmin, session.schoolID])
   return (
-    <Box>
       <Box display="flex" height={600} marginTop={3} >
         <DataGrid
           initialState={{
@@ -249,6 +249,7 @@ const Grid = (props) => {
                 FKPreviligeActionID: false,
                 FKSchoolID: false,
                 FKDeviceStatusID: false,
+                FKDeviceID: false,
                 FKUserID: false,
                 Password: false,
               },
@@ -267,8 +268,6 @@ const Grid = (props) => {
           experimentalFeatures={{ newEditingApi: true }}
         />
       </Box>
-      Reload: {reloadGrid === false ? 0 : 1}
-    </Box >
   )
 }
 export default Grid

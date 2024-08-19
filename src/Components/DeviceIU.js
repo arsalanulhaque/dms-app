@@ -105,7 +105,7 @@ function DeviceIU(props) {
 
     return (
         <>
-            <button type="button" className="btn btn-primary mt-3 float-end" onClick={showModal}>
+            <button type="button" className="btn btn-primary float-end" onClick={showModal}>
                 Add New Device
             </button>
             <Modal show={isVisible} size="lg" dialogClassName={"primaryModal"}>

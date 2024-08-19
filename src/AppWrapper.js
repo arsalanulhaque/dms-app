@@ -1,10 +1,10 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useContext } from "react";
+import { useState } from "react";
 import Login from './Pages/Login'
 import AdminLogin from './Pages/AdminLogin'
 import Register from './Pages/Register'
 import Dashboard from './Pages/Dashboard'
-import Till from './Pages/Search'
+import Search from './Pages/Search'
 
 import Policy from './Components/Policy';
 import Actions from './Components/Actions';
@@ -16,20 +16,20 @@ import Schools from './Components/Schools'
 import Users from './Components/Users';
 import './style.css';
 import { Link, Routes } from "react-router-dom";
-import SessionContext from './Context/SessionContext'
+import{ SessionContext} from './Context/SessionContext'
 
 import {
   BrowserRouter,
   Route,
 } from 'react-router-dom';
-import routes from './Config/routes.js';
+
 
 function AppWrapper() {
-  const { session } = useContext(SessionContext);
+  const [session, setSession] = useState("");
 
   return (
     <div className="container-fluid">
-      <SessionContext.Provider value={{ session }}>
+      <SessionContext.Provider value={{ session, setSession }}>
         <BrowserRouter>
           <Routes>
             <Route index path='/' element={<Login />} />
@@ -38,7 +38,7 @@ function AppWrapper() {
             <Route path='/register' element={<Register />} />
 
             <Route path='/dashboard' element={<Dashboard />} />
-            <Route path='/search' element={<Till />} />
+            <Route path='/search' element={<Search />} />
 
             <Route path='/managedevices' element={<Devices />} />
             <Route path='/managedevicestatus' element={<DeviceStatus />} />

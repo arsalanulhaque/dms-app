@@ -1,5 +1,5 @@
+import { useEffect, useState, useContext } from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useEffect, useState } from 'react';
 import Modal from "react-bootstrap/Modal";
 import ModalHeader from "react-bootstrap/ModalHeader";
 import ModalTitle from "react-bootstrap/ModalTitle";
@@ -10,8 +10,11 @@ import { useFormik } from "formik";
 import * as Yup from 'yup';
 import FetchData from '../Hooks/FetchData'
 import Alert from 'react-bootstrap/Alert';
+import { SessionContext} from '../Context/SessionContext'
 
 function PolicyIU(props) {
+    const { session } = useContext(SessionContext);
+    const [menuID, setMenuID] = useState(-1)
     const [isVisible, setVisible] = useState(false)
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -62,7 +65,7 @@ function PolicyIU(props) {
             formik.initialValues.PreviligeMenuActionsID = props.editRow.PreviligeMenuActionsID
             formik.initialValues.PreviligeID = props.editRow.FKPreviligeID
             formik.initialValues.PreviligeMenuID = props.editRow.FKPreviligeMenuID
-            formik.initialValues.PreviligeActionID = props.editRow.FKPreviligeActionID
+            formik.initialValues.PreviligeActionID = props.editRow.FKPreviligeActionID 
         } else {
             formik.initialValues.PreviligeMenuActionsID = -1
             formik.initialValues.PreviligeID = -1
@@ -85,7 +88,7 @@ function PolicyIU(props) {
 
     return (
         <>
-            <button type="button" className="btn btn-primary mt-3 float-end" onClick={showModal}>
+            <button type="button" className="btn btn-primary float-end" onClick={showModal}>
                 Add New Policy
             </button>
             <Modal show={isVisible} size="lg" dialogClassName={"primaryModal"}>
@@ -101,7 +104,7 @@ function PolicyIU(props) {
                         <div className="form-group">
                             <label htmlFor="PreviligeID">Role Name</label>
                             <Dropdown name="PreviligeID"
-                                api="previlige"
+                                api={session.isAppDeveloper === true ? `previlige` : `previlige/${session.schoolID}`}
                                 keyField='PreviligeID'
                                 valueField='PreviligeName'
                                 selectedValue={formik.values.PreviligeID}
@@ -115,30 +118,34 @@ function PolicyIU(props) {
                         <div className="form-group">
                             <label htmlFor="PreviligeMenuID">Menu Name</label>
                             <Dropdown name="PreviligeMenuID"
-                                api="menus"
+                                api={session.isAppDeveloper === true ? `menus` : `menus/${session.schoolID}/${session.previligeID}`}
                                 keyField='MenuID'
                                 valueField='MenuName'
                                 selectedValue={formik.values.PreviligeMenuID}
-                                onChange={value => formik.setFieldValue('PreviligeMenuID', value.value)}
+                                onChange={value => {
+                                    formik.setFieldValue('PreviligeMenuID', value.value)
+                                    setMenuID(value.value)
+                                }}
                             />
                             <div className="text-danger">
                                 {formik.errors.PreviligeMenuID ? formik.errors.PreviligeMenuID : null}
                             </div>
                         </div>
-
-                        <div className="form-group">
-                            <label htmlFor="PreviligeActionID">Action Name</label>
-                            <Dropdown name="PreviligeActionID"
-                                api="actions"
-                                keyField='ActionID'
-                                valueField='ActionName'
-                                selectedValue={formik.values.PreviligeActionID}
-                                onChange={value => formik.setFieldValue('PreviligeActionID', value.value)}
-                            />
-                            <div className="text-danger">
-                                {formik.errors.PreviligeActionID ? formik.errors.PreviligeActionID : null}
+                        {menuID < 1 ? <></> :
+                            <div className="form-group">
+                                <label htmlFor="PreviligeActionID">Action Name</label>
+                                <Dropdown name="PreviligeActionID"
+                                    api={session.isAppDeveloper === true ? `actions` : `actions/${menuID}`}
+                                    keyField='ActionID'
+                                    valueField='ActionName'
+                                    selectedValue={formik.values.PreviligeActionID}
+                                    onChange={value => formik.setFieldValue('PreviligeActionID', value.value)}
+                                />
+                                <div className="text-danger">
+                                    {formik.errors.PreviligeActionID ? formik.errors.PreviligeActionID : null}
+                                </div>
                             </div>
-                        </div>
+                        }
                     </ModalBody>
                     <ModalFooter>
                         <button type="reset" className="btn btn-warning" onClick={formik.handleReset}>Reset</button>

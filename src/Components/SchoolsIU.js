@@ -82,7 +82,7 @@ function SchoolsIU(props) {
 
     return (
         <>
-            <button type="button" className="btn btn-primary mt-3 float-end" onClick={showModal}>
+            <button type="button" className="btn btn-primary float-end" onClick={showModal}>
                 Add New School
             </button>
             <Modal show={isVisible} size="lg" dialogClassName={"primaryModal"}>

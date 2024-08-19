@@ -1,11 +1,11 @@
 
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
 import PreviligesIU from './PreviligesIU'
 import Alert from 'react-bootstrap/Alert';
-import SessionContext from '../Context/SessionContext'
+import { SessionContext} from '../Context/SessionContext'
 
 function Previliges() {
     const { session } = useContext(SessionContext);
@@ -39,25 +39,35 @@ function Previliges() {
         setAlertType(alertType)
         setReload(true)
     }
+    useEffect(() => {
+
+    }, [setEditRow])
 
     return (
         <>
             <Header />
             <Sidebar />
             <main id="main" className="main">
-                <div className="pagetitle">
-                    <h1>Manage Roles</h1>
-                </div>
+
                 <section className="section">
                     <div className="card">
                         <div className="card-header">
-                            <Alert key={alertType} variant={alertType}>
+                            <div className='row mb-2'>
+                                <div className='col'>
+                                    <div className="pagetitle">
+                                        <h1>Manage Roles</h1>
+                                    </div>
+                                </div>
+                                <div className='col'>
+                                    <PreviligesIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen} />
+                                </div>
+                            </div>
+                            <Alert className='m-0 p-2' key={alertType} variant={alertType}>
                                 {message}
                             </Alert>
-                            <PreviligesIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen}/>
                         </div>
                         <div className="card-body">
-                            <Grid api={session.isAppDeveloper === true ? `previlige` : `previlige/${session.schoolID}`}  editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
+                            <Grid api={session.isAppDeveloper === true ? `previlige` : `previlige/${session.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
                         </div>
                     </div>
                 </section>

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import SessionContext from '../Context/SessionContext'
+import { SessionContext} from '../Context/SessionContext'
 import React, { useContext, useEffect, } from "react";
 import iconProfile from '../assets/img/profile.png'
 

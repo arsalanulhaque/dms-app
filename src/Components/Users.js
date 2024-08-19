@@ -5,7 +5,7 @@ import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
 import UsersIU from './UsersIU'
 import Alert from 'react-bootstrap/Alert';
-import SessionContext from '../Context/SessionContext'
+import { SessionContext} from '../Context/SessionContext'
 
 function Users() {
     const { session } = useContext(SessionContext);
@@ -45,16 +45,23 @@ function Users() {
             <Header />
             <Sidebar />
             <main id="main" className="main">
-                <div className="pagetitle">
-                    <h1>Manage Users</h1>
-                </div>
+
                 <section className="section">
                     <div className="card">
                         <div className='card-header'>
-                            <Alert key={alertType} variant={alertType}>
+                            <div className='row mb-2'>
+                                <div className='col'>
+                                    <div className="pagetitle">
+                                        <h1>Manage Users</h1>
+                                    </div>
+                                </div>
+                                <div className='col'>
+                                    <UsersIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen} />
+                                </div>
+                            </div>
+                            <Alert className='m-0 p-2' key={alertType} variant={alertType}>
                                 {message}
                             </Alert>
-                            <UsersIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen} />
                         </div>
                         <div className="card-body">
                             <Grid api={session.isAppDeveloper === true ? `users` : `users/${session.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />

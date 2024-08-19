@@ -90,11 +90,11 @@ function UsersIU(props) {
             formik.initialValues.SchoolID = -1
             formik.initialValues.PreviligeID = -1
             formik.initialValues.EmailID = ""
-            formik.initialValues.FirstName = ""
-            formik.initialValues.LastName = ""
             formik.initialValues.Username = ""
             formik.initialValues.Password = ""
             formik.initialValues.NfcID = ""
+            formik.initialValues.FirstName = ""
+            formik.initialValues.LastName = ""
         }
     }, [props, isVisible, formik, formik.initialValues])
 
@@ -112,7 +112,7 @@ function UsersIU(props) {
 
     return (
         <>
-            <button type="button" className="btn btn-primary mt-3 float-end" onClick={showModal}>
+            <button type="button" className="btn btn-primary float-end" onClick={showModal}>
                 Add New User
             </button>
             <Modal show={isVisible} size="lg" dialogClassName={"primaryModal"}>
@@ -167,19 +167,6 @@ function UsersIU(props) {
                                 </div>
                             </div>
 
-                            <div className="form-group">
-                                <label htmlFor="Username">User Name</label>
-                                <input
-                                    name="Username"
-                                    type="text"
-                                    className="form-control"
-                                    onChange={formik.handleChange}
-                                    value={formik.values.Username}
-                                />
-                                <div className="text-danger">
-                                    {formik.errors.Username ? formik.errors.Username : null}
-                                </div>
-                            </div>
 
                             <div className="form-group">
                                 <label htmlFor="Username">User Name</label>

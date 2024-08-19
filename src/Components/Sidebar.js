@@ -1,6 +1,6 @@
 import '../style.css';
 import { Link } from "react-router-dom";
-import SessionContext from '../Context/SessionContext'
+import { SessionContext} from '../Context/SessionContext'
 import React, { useContext, useEffect, useState, } from "react";
 import iconUser from '../assets/img/user.png'
 import iconSchool from '../assets/img/school.png'

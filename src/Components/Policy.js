@@ -1,12 +1,15 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
 import PolicyIU from './PolicyIU'
 import Alert from 'react-bootstrap/Alert';
+import { SessionContext} from '../Context/SessionContext'
 
 function Policy() {
+    const { session } = useContext(SessionContext);
     const [editRow, setEditRow] = useState({})
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -21,7 +24,7 @@ function Policy() {
         if (isOpen)
             setReload(false)
     }
-    
+
     const handleModalClosed = (message, alertType, isClosed) => {
         if (isClosed) {
             setEditRow(null)
@@ -42,24 +45,32 @@ function Policy() {
             <Header />
             <Sidebar />
             <main id="main" className="main">
-                <div className="pagetitle">
-                    <h1>Manage Policy</h1>
-                </div>
+
                 <section className="section">
                     <div className="card">
                         <div className="card-header">
-                            <Alert key={alertType} variant={alertType}>
+                            <div className='row mb-2'>
+                                <div className='col'>
+                                    <div className="pagetitle">
+                                        <h1>Manage Policy</h1>
+                                    </div>
+                                </div>
+                                <div className='col'>
+                                    <PolicyIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen} />
+                                </div>
+                            </div>
+                            <Alert className='m-0 p-2' key={alertType} variant={alertType}>
                                 {message}
                             </Alert>
-                            <PolicyIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen}/>
                         </div >
                         <div className="card-body">
-                            <Grid api='policy' editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
+                            <Grid api={session.isAppDeveloper === true ? `policy` : `policy/${session.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
                         </div>
                     </div>
                 </section>
             </main>
-        </>);
+        </>
+    )
 }
 
 export default Policy;
