@@ -53,7 +53,7 @@ function Till() {
     const onScanItem = (e) => {
         if (e.key === 'Enter' || e.keyCode === 13) {
             if (results.length === 0) {
-                reload(`device/barcode/${inputRef.current.value}/schoolID/${session.schoolID}`, 'get', undefined)
+                reload(`device/barcode/${inputRef.current.value}/schoolID/${getSession()?.schoolID}`, 'get', undefined)
                 findItemInList()
             }
             else if (results.length > 0) { findItemInList() }
@@ -116,9 +116,9 @@ function Till() {
                                                     </div>
                                                     <div className="col-5">
                                                         {/* {prod.IsIssued === 0 ? <span className="btn-bookNow fs-6 float-end fw-bold text-warning" onClick={() => onBookDevice(prod)}>Book Now</span> : ''}
-                                                        {prod.IsIssued === 1 && prod.FKUserID === session.userID ?
+                                                        {prod.IsIssued === 1 && prod.FKUserID === getSession()?.userID ?
                                                             <span className="btn-bookNow fs-6 float-end fw-bold text-danger" onClick={() => onReturnDevice(prod)}>Return Now</span> : ''} */}
-                                                        {prod.IsIssued === 1 && prod.FKUserID !== session.userID ?
+                                                        {prod.IsIssued === 1 && prod.FKUserID !== getSession()?.userID ?
                                                             <span className="btn-already-booked fs-6 float-end fw-bold">Already Booked</span> : ''}
                                                     </div>
                                                 </div>

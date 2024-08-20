@@ -32,7 +32,7 @@ function ActionsIU(props) {
             let endpoint = 'actions'
             let body = {
                 "action": {
-                    "ActionID": data.ActionID,
+                    "ActionID": props?.editRow?.ActionID > 0 ? props?.editRow?.ActionID : null,
                     "ActionName": data.ActionName,
                 }
             }

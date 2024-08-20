@@ -5,10 +5,10 @@ import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
 import PreviligesIU from './PreviligesIU'
 import Alert from 'react-bootstrap/Alert';
-import { SessionContext} from '../Context/SessionContext'
+import useSession from '../Context/SessionContext'
 
 function Previliges() {
-    const { session } = useContext(SessionContext);
+   const [getSession, setSession] = useSession()
     const [editRow, setEditRow] = useState({})
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -67,7 +67,7 @@ function Previliges() {
                             </Alert>
                         </div>
                         <div className="card-body">
-                            <Grid api={session.isAppDeveloper === true ? `previlige` : `previlige/${session.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
+                            <Grid api={getSession()?.isAppDeveloper === true ? `previlige` : `previlige/${getSession()?.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
                         </div>
                     </div>
                 </section>

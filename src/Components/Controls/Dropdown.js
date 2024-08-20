@@ -1,12 +1,10 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, } from "react";
 import FetchData from '../../Hooks/FetchData'
-import { SessionContext} from '../../Context/SessionContext'
 import Select from 'react-select'
 import $ from "jquery";
 
 function Dropdown(props) {
     const [data, setData] = useState([])
-    const { session } = useContext(SessionContext);
 
     let formatOptionLabel = ({ value, label, labelSchool }) => (
         <div style={{ display: "flex" }}>
@@ -23,7 +21,7 @@ function Dropdown(props) {
         })
 
         let options = [{ value: -1, label: 'Select' }]
-        //session.isAppDeveloper === true ? props.api : `${props.api}/${session.schoolID}`
+        
         FetchData(props.api, 'get', null, (result) => {
             if (result.error === false) {
                 let res = result

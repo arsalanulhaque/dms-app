@@ -5,10 +5,10 @@ import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
 import SchoolsIU from './SchoolsIU'
 import Alert from 'react-bootstrap/Alert';
-import { SessionContext} from '../Context/SessionContext'
+import useSession from '../Context/SessionContext'
 
 function Schools() {
-    const { session } = useContext(SessionContext);
+   const [getSession, setSession] = useSession()
     const [editRow, setEditRow] = useState({})
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -65,7 +65,7 @@ function Schools() {
                             </Alert>
                         </div >
                         <div className="card-body">
-                            <Grid api={session.isAppDeveloper === true ? `school` : `school/${session.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
+                            <Grid api={getSession()?.isAppDeveloper === true ? `school` : `school/${getSession()?.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
                         </div>
                     </div>
                 </section>

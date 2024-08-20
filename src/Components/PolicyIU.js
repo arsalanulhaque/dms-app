@@ -10,10 +10,10 @@ import { useFormik } from "formik";
 import * as Yup from 'yup';
 import FetchData from '../Hooks/FetchData'
 import Alert from 'react-bootstrap/Alert';
-import { SessionContext} from '../Context/SessionContext'
+import useSession from '../Context/SessionContext'
 
 function PolicyIU(props) {
-    const { session } = useContext(SessionContext);
+   const [getSession, setSession] = useSession()
     const [menuID, setMenuID] = useState(-1)
     const [isVisible, setVisible] = useState(false)
     const [message, setMessage] = useState('')
@@ -104,7 +104,7 @@ function PolicyIU(props) {
                         <div className="form-group">
                             <label htmlFor="PreviligeID">Role Name</label>
                             <Dropdown name="PreviligeID"
-                                api={session.isAppDeveloper === true ? `previlige` : `previlige/${session.schoolID}`}
+                                api={getSession()?.isAppDeveloper === true ? `previlige` : `previlige/${getSession()?.schoolID}`}
                                 keyField='PreviligeID'
                                 valueField='PreviligeName'
                                 selectedValue={formik.values.PreviligeID}
@@ -118,7 +118,7 @@ function PolicyIU(props) {
                         <div className="form-group">
                             <label htmlFor="PreviligeMenuID">Menu Name</label>
                             <Dropdown name="PreviligeMenuID"
-                                api={session.isAppDeveloper === true ? `menus` : `menus/${session.schoolID}/${session.previligeID}`}
+                                api={getSession()?.isAppDeveloper === true ? `menus` : `menus/${getSession()?.schoolID}/${getSession()?.previligeID}`}
                                 keyField='MenuID'
                                 valueField='MenuName'
                                 selectedValue={formik.values.PreviligeMenuID}
@@ -135,7 +135,7 @@ function PolicyIU(props) {
                             <div className="form-group">
                                 <label htmlFor="PreviligeActionID">Action Name</label>
                                 <Dropdown name="PreviligeActionID"
-                                    api={session.isAppDeveloper === true ? `actions` : `actions/${menuID}`}
+                                    api={getSession()?.isAppDeveloper === true ? `actions` : `actions/${menuID}`}
                                     keyField='ActionID'
                                     valueField='ActionName'
                                     selectedValue={formik.values.PreviligeActionID}

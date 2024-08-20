@@ -1,4 +1,16 @@
-import { createContext } from "react";
-export const SessionContext = createContext({ session: { data: [] } })
-//export default SessionContext// = createContext({ session: { } })
-// export const SessionContext = React.createContext({ session: {} });
+
+function useSession() {
+
+    const setSession = (value) => {
+        localStorage.setItem("session", JSON.stringify(value));
+    }
+
+    const getSession = () => {
+        let temp = JSON.parse(localStorage.getItem("session"))
+        return temp
+    }
+
+    return [getSession, setSession]
+}
+
+export default useSession;

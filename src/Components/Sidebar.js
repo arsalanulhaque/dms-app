@@ -1,7 +1,7 @@
 import '../style.css';
 import { Link } from "react-router-dom";
-import { SessionContext} from '../Context/SessionContext'
-import React, { useContext, useEffect, useState, } from "react";
+import useSession from '../Context/SessionContext'
+import React, { useEffect, useState, } from "react";
 import iconUser from '../assets/img/user.png'
 import iconSchool from '../assets/img/school.png'
 import iconPrevilige from '../assets/img/previlige.png'
@@ -12,15 +12,13 @@ import iconPolicy from '../assets/img/policies.png'
 import iconStatus from '../assets/img/status.png'
 import iconHome from '../assets/img/home.png'
 
-
-
 function Sidebar() {
-    const { session } = useContext(SessionContext)
+    const [getSession, setSession] = useSession()
     const [nav, setNav] = useState([])
 
     useEffect(() => {
         let arr = []
-        session.data.map((item) => {
+        getSession()?.data.map((item) => {
             let i = arr.find(i => i.MenuName === item.MenuName)
             if (i === undefined) {
                 let o = { 'Link': item.Link, 'MenuName': item.MenuName, Icon: item.Icon }
@@ -28,7 +26,7 @@ function Sidebar() {
             }
         })
         setNav(arr)
-    }, [setNav, session])
+    }, [setNav])
 
     return (
         <>
@@ -44,11 +42,11 @@ function Sidebar() {
                                             item.Icon === 'previlige' ? iconPrevilige :
                                                 item.Icon === 'devices' ? iconDevice :
                                                     item.Icon === 'school' ? iconSchool :
-                                                    item.Icon === 'actions' ? iconAction :
-                                                    item.Icon === 'menus' ? iconMenu :
-                                                    item.Icon === 'policies' ? iconPolicy :
-                                                    item.Icon === 'home' ? iconHome :
-                                                    item.Icon === 'status' ? iconStatus : ''} height='30' />
+                                                        item.Icon === 'actions' ? iconAction :
+                                                            item.Icon === 'menus' ? iconMenu :
+                                                                item.Icon === 'policies' ? iconPolicy :
+                                                                    item.Icon === 'home' ? iconHome :
+                                                                        item.Icon === 'status' ? iconStatus : ''} height='30' />
                                     </i>
                                     <span>{item.MenuName}</span>
 

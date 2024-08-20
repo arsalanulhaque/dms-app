@@ -1,6 +1,6 @@
 import FetchData from '../Hooks/FetchData'
 import React, { useContext, useEffect, useRef, useState, } from "react";
-import { SessionContext} from '../Context/SessionContext'
+import useSession from '../Context/SessionContext'
 import { useNavigate } from 'react-router-dom';
 import Alert from 'react-bootstrap/Alert';
 import { Link } from "react-router-dom";
@@ -9,7 +9,7 @@ import iconLogin from '../assets/img/login_icon.png'
 
 function Login() {
     const navigate = useNavigate();
-    const { session, setSession } = useContext(SessionContext);
+    const [getSession, setSession] = useSession();
     const [alertType, setAlertType] = useState('')
     const [message, setMessage] = useState('')
     const inputRef = useRef(null);
@@ -48,13 +48,15 @@ function Login() {
                         error: result?.data?.error,
                         isAdmin: result?.data?.data[0].PreviligeName === 'Admin' ? true : false,
                         isAppDeveloper: result?.data?.data[0].PreviligeName === 'AppDeveloper' ? true : false,
-                        //session.isSuperAdmin = result.data.data[0].PreviligeName === 'Super Admin' ? true : false
+                        //getSession()?.isSuperAdmin = result.data.data[0].PreviligeName === 'Super Admin' ? true : false
                         schoolID: result?.data?.data[0].SchoolID,
                         userID: result?.data?.data[0].UserID,
                         emailID: result?.data?.data[0].EmailID,
                         previligeID: result?.data?.data[0].PreviligeID
                     }
                     setSession(_session)
+
+
                     if (result.code === 'ERR_NETWORK') {
                         setAlertType('danger')
                         setMessage(result?.message)

@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
-import { SessionContext} from '../Context/SessionContext'
-import React, { useContext, useEffect, } from "react";
+import useSession from '../Context/SessionContext'
+import React, { useContext, useEffect, useState } from "react";
 import iconProfile from '../assets/img/profile.png'
 
 function Header() {
-    const { session } = useContext(SessionContext);
+    const [getSession, setSession] = useSession();
 
     return (
         < header id="header" className="header fixed-top d-flex align-items-center" >
@@ -23,49 +23,18 @@ function Header() {
 
                         <a className="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
                             <img src={iconProfile} alt="Profile" className="rounded-circle" />
-                            <span className="d-none d-md-block dropdown-toggle ps-2">{ session?.data[0]?.Username}</span>
+                            <span className="d-none d-md-block dropdown-toggle ps-2">{getSession()?.data[0]?.Username}</span>
                         </a>
                         {/* <!-- End Profile Iamge Icon --> */}
 
                         <ul className="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                             <li className="dropdown-header">
-                                <h6>{session?.data[0]?.Username}</h6>
-                                <span>{session?.data[0]?.PreviligeName}</span>
+                                <h6>{getSession()?.data[0]?.Username}</h6>
+                                <span>{getSession()?.data[0]?.PreviligeName}</span>
                             </li>
                             <li>
                                 <hr className="dropdown-divider" />
                             </li>
-
-                            {/* <li>
-                                <a className="dropdown-item d-flex align-items-center" href="users-profile.html">
-                                    <i className="bi bi-person"></i>
-                                    <span>My Profile</span>
-                                </a>
-                            </li>
-                            <li>
-                                <hr className="dropdown-divider" />
-                            </li>
-
-                            <li>
-                                <a className="dropdown-item d-flex align-items-center" href="users-profile.html">
-                                    <i className="bi bi-gear"></i>
-                                    <span>Account Settings</span>
-                                </a>
-                            </li>
-                            <li>
-                                <hr className="dropdown-divider" />
-                            </li>
-
-                            <li>
-                                <a className="dropdown-item d-flex align-items-center" href="pages-faq.html">
-                                    <i className="bi bi-question-circle"></i>
-                                    <span>Need Help?</span>
-                                </a>
-                            </li>
-                            <li>
-                                <hr className="dropdown-divider" />
-                            </li> */}
-
                             <li>
                                 <Link to='/Login' className="dropdown-item d-flex align-items-center">
                                     <i className="bi bi-box-arrow-right"></i>

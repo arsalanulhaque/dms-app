@@ -6,10 +6,10 @@ import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
 import PolicyIU from './PolicyIU'
 import Alert from 'react-bootstrap/Alert';
-import { SessionContext} from '../Context/SessionContext'
+import useSession from '../Context/SessionContext'
 
 function Policy() {
-    const { session } = useContext(SessionContext);
+    const [getSession, setSession] = useSession()
     const [editRow, setEditRow] = useState({})
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -64,7 +64,7 @@ function Policy() {
                             </Alert>
                         </div >
                         <div className="card-body">
-                            <Grid api={session.isAppDeveloper === true ? `policy` : `policy/${session.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
+                            <Grid api={getSession()?.isAppDeveloper === true ? `policy` : `policy/${getSession()?.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
                         </div>
                     </div>
                 </section>

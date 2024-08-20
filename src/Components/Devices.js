@@ -1,13 +1,13 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
 import DeviceIU from './DeviceIU';
 import Alert from 'react-bootstrap/Alert';
-import { SessionContext} from '../Context/SessionContext'
+import useSession from '../Context/SessionContext'
 
 function Devices() {
-    const { session } = useContext(SessionContext);
+    const [getSession, setSession] = useSession()
     const [editRow, setEditRow] = useState({})
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -63,7 +63,7 @@ function Devices() {
                             </Alert>
                         </div>
                         <div className="card-body">
-                            <Grid api={session.isAppDeveloper === true ? `device` : `device/${session.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
+                            <Grid api={getSession()?.isAppDeveloper === true ? `device` : `device/${getSession()?.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
                         </div>
                     </div>
                 </section>

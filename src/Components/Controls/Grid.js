@@ -4,11 +4,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box } from '@mui/system';
 import FetchData from '../../Hooks/FetchData'
-import { SessionContext} from '../../Context/SessionContext'
+import useSession from '../../Context/SessionContext'
 
 
 const Grid = (props) => {
-  const { session } = useContext(SessionContext);
+  const [getSession, setSession] = useSession()
   const [rows, setRows] = useState([])
   const [columns, setColumns] = useState([])
   const permissions = useRef({ create: false, update: false, delete: false, retrieve: false })
@@ -80,7 +80,7 @@ const Grid = (props) => {
 
   useEffect(() => {
     setReload(props.reload)
-    session.data.map((item) => {
+    getSession()?.data.map((item) => {
       if (item.Link === window.location.pathname) {
         switch (item.ActionName) {
           case 'Create':
@@ -236,38 +236,38 @@ const Grid = (props) => {
       }
     })
 
-  }, [props.api, props.reload, reloadGrid, addActionCols, rows?.length, session.data, session.isSuperAdmin, session.schoolID])
+  }, [props.api, props.reload, reloadGrid, addActionCols, rows?.length, getSession()?.data, getSession()?.isSuperAdmin, getSession()?.schoolID])
   return (
-      <Box display="flex" height={600} marginTop={3} >
-        <DataGrid
-          initialState={{
-            columns: {
-              columnVisibilityModel: {
-                // Hide columns status and traderName, the other columns will remain visible
-                FKPreviligeID: false,
-                FKPreviligeMenuID: false,
-                FKPreviligeActionID: false,
-                FKSchoolID: false,
-                FKDeviceStatusID: false,
-                FKDeviceID: false,
-                FKUserID: false,
-                Password: false,
-              },
+    <Box display="flex" height={600} marginTop={3} >
+      <DataGrid
+        initialState={{
+          columns: {
+            columnVisibilityModel: {
+              // Hide columns status and traderName, the other columns will remain visible
+              FKPreviligeID: false,
+              FKPreviligeMenuID: false,
+              FKPreviligeActionID: false,
+              FKSchoolID: false,
+              FKDeviceStatusID: false,
+              FKDeviceID: false,
+              FKUserID: false,
+              Password: false,
             },
-          }}
-          rows={rows}
-          columns={columns}
-          components={{
-            Toolbar: GridToolbar,
-          }}
-          componentsProps={{
-            toolbar: {
-              showQuickFilter: true,
-            },
-          }}
-          experimentalFeatures={{ newEditingApi: true }}
-        />
-      </Box>
+          },
+        }}
+        rows={rows}
+        columns={columns}
+        components={{
+          Toolbar: GridToolbar,
+        }}
+        componentsProps={{
+          toolbar: {
+            showQuickFilter: true,
+          },
+        }}
+        experimentalFeatures={{ newEditingApi: true }}
+      />
+    </Box>
   )
 }
 export default Grid

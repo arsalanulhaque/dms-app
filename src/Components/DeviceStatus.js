@@ -2,11 +2,11 @@
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
-import { SessionContext } from '../Context/SessionContext'
-import React, { useContext } from 'react';
+import useSession from '../Context/SessionContext'
+import React from 'react';
 
 function DeviceStatus() {
-    const { session } = useContext(SessionContext);
+    const [getSession, setSession] = useSession()
 
     return (
         <>
@@ -26,7 +26,7 @@ function DeviceStatus() {
                             </div>
                         </div>
                         <div className="card-body">
-                            <Grid api={session.isAppDeveloper === true ? `devicestatus` : `devicestatus/school/${session.schoolID}`} />
+                            <Grid api={getSession()?.isAppDeveloper === true ? `devicestatus` : `devicestatus/school/${getSession()?.schoolID}`} />
                         </div>
                     </div>
                 </section >

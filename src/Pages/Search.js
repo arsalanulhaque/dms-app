@@ -1,7 +1,6 @@
 import '../style.css'
 import React, { useContext, useEffect, useState, useRef, } from "react";
-import { SessionContext} from '../Context/SessionContext'
-import { Link } from "react-router-dom";
+import useSession from '../Context/SessionContext'
 import FetchData from '../Hooks/FetchData'
 import Header from '../Components/Header';
 import DeviceList from '../Components/DeviceList';
@@ -11,7 +10,7 @@ import iconSuccess from '../assets/img/success_icon.png'
 
 function Search() {
     const inputRef = useRef(null);
-    const { session } = useContext(SessionContext);
+   const [getSession, setSession] = useSession()
     const [alertType, setAlertType] = useState('')
     const [message, setMessage] = useState('')
     const [isLoader, setLoader] = useState(false)
@@ -32,7 +31,7 @@ function Search() {
 
     const onItemScan = (e) => {
         if (e.key === 'Enter' || e.keyCode === 13) {
-            makeRequest(`device/barcode/${inputRef.current.value}/schoolID/${session.schoolID}`, 'get', undefined)
+            makeRequest(`device/barcode/${inputRef.current.value}/schoolID/${getSession()?.schoolID}`, 'get', undefined)
         }
     }
 
@@ -58,9 +57,9 @@ function Search() {
     const addToAvailableDevices = (device) => {
         if (device.Username === null) {
             if (!isDeviceInList(device, lstAvailableDevices) && lstIssuedDevices.length === 0) {
-                device.UserID = session.userID
-                device.EmailID = session.emailID
-                device.Username = session?.data[0]?.Username
+                device.UserID = getSession()?.userID
+                device.EmailID = getSession()?.emailID
+                device.Username = getSession().data[0]?.Username
                 let spreaded = [...lstAvailableDevices, device]
                 spreaded.sort((a, b) => (a.IsIssued > b.IsIssued) ? 1 : ((b.IsIssued > a.IsIssued) ? -1 : 0))
                 setSelectedOnScan(spreaded)
@@ -74,10 +73,10 @@ function Search() {
     }
 
     const addToIssuedDevices = (device) => {
-        if (device.IsIssued === 1 && device.FKUserID === session.userID) {
+        if (device.IsIssued === 1 && device.FKUserID === getSession()?.userID) {
             if (!isDeviceInList(device, lstIssuedDevices) && lstAvailableDevices.length === 0) {
-                device.UserID = session.userID
-                device.EmailID = session.emailID
+                device.UserID = getSession()?.userID
+                device.EmailID = getSession()?.emailID
                 let spreaded = [...lstIssuedDevices, device]
                 spreaded.sort((a, b) => (a.IsIssued > b.IsIssued) ? 1 : ((b.IsIssued > a.IsIssued) ? -1 : 0))
                 setSelectedOnScan(spreaded)
@@ -91,7 +90,7 @@ function Search() {
     }
 
     const addToOccupiedDevices = (device) => {
-        if (device.IsIssued === 1 && device.FKUserID !== session.userID) {
+        if (device.IsIssued === 1 && device.FKUserID !== getSession()?.userID) {
             if (!isDeviceInList(device, lstUnavailableDevices)) {
                 let spreaded = [...lstUnavailableDevices, device]
                 //spreaded = [...new Set(spreaded)]
