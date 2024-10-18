@@ -20,11 +20,12 @@ function AdminLogin() {
     });
 
     const formik = useFormik({
+        enableReinitialize: true,  // This ensures the form will reinitialize when the userData changes
+        validationSchema,
         initialValues: {
             Email: "",
             Password: "",
         },
-        validationSchema,
         onSubmit: (data) => {
             let httpMethod = 'post'
             let endpoint = 'login'

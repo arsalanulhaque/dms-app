@@ -21,15 +21,16 @@ function MenusIU(props) {
     });
 
     const formik = useFormik({
-        initialValues: {
-            MenuID: -1,
-            MenuName: "",
-            Url: "",
-            Icon: ""
-        },
+        enableReinitialize: true,  // This ensures the form will reinitialize when the userData changes
         validationSchema,
         validateOnChange: true,
         validateOnBlur: false,
+        initialValues: {
+            MenuID: props?.editRow?.MenuID || -1,
+            MenuName: props?.editRow?.MenuName || "",
+            Url: props?.editRow?.URL || "",
+            Icon: props?.editRow?.Icon || ""
+        },
         onSubmit: (data) => {
             let httpMethod = props.editRow?.MenuID > -1 ? 'put' : 'post'
             let endpoint = 'menus'
@@ -57,17 +58,8 @@ function MenusIU(props) {
     useEffect(() => {
         if (props.editRow?.MenuID > -1) {
             showModal()
-            formik.initialValues.MenuID = props.editRow.MenuID
-            formik.initialValues.MenuName = props.editRow.MenuName
-            formik.initialValues.Url = props.editRow.URL
-            formik.initialValues.Icon = props.editRow.Icon
-        } else {
-            formik.initialValues.MenuID = -1
-            formik.initialValues.MenuName = ""
-            formik.initialValues.Url = ""
-            formik.initialValues.Icon = ""
         }
-    }, [props, isVisible, formik, formik.initialValues])
+    }, [props,])
 
     const showModal = () => {
         setVisible(true)

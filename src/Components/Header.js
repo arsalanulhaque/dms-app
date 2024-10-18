@@ -4,7 +4,10 @@ import React, { useContext, useEffect, useState } from "react";
 import iconProfile from '../assets/img/profile.png'
 
 function Header() {
-    const [getSession, setSession] = useSession();
+    const [getSession, setSession, killSession] = useSession();
+    const handleLogout=()=>{
+        killSession()
+    }
 
     return (
         < header id="header" className="header fixed-top d-flex align-items-center" >
@@ -36,7 +39,7 @@ function Header() {
                                 <hr className="dropdown-divider" />
                             </li>
                             <li>
-                                <Link to='/Login' className="dropdown-item d-flex align-items-center">
+                                <Link to='/Login' onClick={handleLogout} className="dropdown-item d-flex align-items-center">
                                     <i className="bi bi-box-arrow-right"></i>
                                     <span>Sign Out</span>
                                 </Link>

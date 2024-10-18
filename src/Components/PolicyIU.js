@@ -13,7 +13,7 @@ import Alert from 'react-bootstrap/Alert';
 import useSession from '../Context/SessionContext'
 
 function PolicyIU(props) {
-   const [getSession, setSession] = useSession()
+    const [getSession, setSession] = useSession()
     const [menuID, setMenuID] = useState(-1)
     const [isVisible, setVisible] = useState(false)
     const [message, setMessage] = useState('')
@@ -26,15 +26,16 @@ function PolicyIU(props) {
     });
 
     const formik = useFormik({
-        initialValues: {
-            PreviligeMenuActionsID: -1,
-            PreviligeID: -1,
-            PreviligeMenuID: -1,
-            PreviligeActionID: -1
-        },
+        enableReinitialize: true,  // This ensures the form will reinitialize when the userData changes
         validationSchema,
         validateOnChange: true,
         validateOnBlur: false,
+        initialValues: {
+            PreviligeMenuActionsID: props?.editRow?.PreviligeMenuActionsID || -1,
+            PreviligeID: props?.editRow?.FKPreviligeID || -1,
+            PreviligeMenuID: props?.editRow?.FKPreviligeMenuID || -1,
+            PreviligeActionID: props?.editRow?.FKPreviligeActionID || -1
+        },
         onSubmit: (data) => {
             let httpMethod = props.editRow?.PreviligeMenuActionsID > -1 ? 'put' : 'post'
             let endpoint = 'policy'
@@ -62,17 +63,8 @@ function PolicyIU(props) {
     useEffect(() => {
         if (props.editRow?.PreviligeMenuActionsID > -1) {
             showModal()
-            formik.initialValues.PreviligeMenuActionsID = props.editRow.PreviligeMenuActionsID
-            formik.initialValues.PreviligeID = props.editRow.FKPreviligeID
-            formik.initialValues.PreviligeMenuID = props.editRow.FKPreviligeMenuID
-            formik.initialValues.PreviligeActionID = props.editRow.FKPreviligeActionID 
-        } else {
-            formik.initialValues.PreviligeMenuActionsID = -1
-            formik.initialValues.PreviligeID = -1
-            formik.initialValues.PreviligeMenuID = -1
-            formik.initialValues.PreviligeActionID = -1
         }
-    }, [props, isVisible, formik, formik.initialValues])
+    }, [props])
 
     const showModal = () => {
         setVisible(true)

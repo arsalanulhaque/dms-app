@@ -1,5 +1,7 @@
+import { useNavigate } from 'react-router-dom';
 
 function useSession() {
+    const navigate = useNavigate();
 
     const setSession = (value) => {
         localStorage.setItem("session", JSON.stringify(value));
@@ -7,10 +9,17 @@ function useSession() {
 
     const getSession = () => {
         let temp = JSON.parse(localStorage.getItem("session"))
-        return temp
+        if (temp === null || temp === undefined) { 
+            navigate('/')
+        }
+        else { return temp }
     }
 
-    return [getSession, setSession]
+    const killSession = () => {
+        localStorage.removeItem("session");
+    }
+
+    return [getSession, setSession, killSession]
 }
 
 export default useSession;

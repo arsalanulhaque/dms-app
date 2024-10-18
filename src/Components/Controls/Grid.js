@@ -5,6 +5,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Box } from '@mui/system';
 import FetchData from '../../Hooks/FetchData'
 import useSession from '../../Context/SessionContext'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import ConfirmModal from '../SharedComponents/ConfirmModal';
 
 
 const Grid = (props) => {
@@ -13,8 +15,37 @@ const Grid = (props) => {
   const [columns, setColumns] = useState([])
   const permissions = useRef({ create: false, update: false, delete: false, retrieve: false })
   const [reloadGrid, setReload] = useState(false)
+  const [showConfirmModal, setConfirmModal] = useState(false);
+  const [IdToDelete, setIdToDelete] = useState(-1);
+  const [confirmationMesssage, setConfirmationMessage] = useState(-1);
 
-  const handleDeleteClick = (id) => () => {
+
+  const handleConfirmModalClose = () => {
+    setConfirmModal(false);
+    setIdToDelete(-1)
+    setConfirmationMessage(null)
+  };
+
+  const handleConfirmModalConfirm = () => {
+    // Implement your deletion logic here
+    deleteRow(IdToDelete);
+    handleConfirmModalClose();
+  };
+
+  const handleDeleteClick = (row) => () => {
+    setConfirmModal(true)
+    if (row?.row?.IsIssued) {
+      if (row?.row?.IsIssued === 1) {
+        setIdToDelete(-1)
+        setConfirmationMessage(`Device with ID: ${row.id} is issued and you can't delete this device before return!`)
+      }
+    } else {
+      setIdToDelete(row.id)
+      setConfirmationMessage(`Are you sure you want to delete record with ID: ${row.id}?`)
+    }
+  }
+
+  const deleteRow = (id) => {
     setReload(false)
     let endpoint = ''
     let body = {}
@@ -72,7 +103,7 @@ const Grid = (props) => {
         <GridActionsCellItem
           icon={<DeleteIcon sx={{ color: 'red' }} />}
           label="Delete"
-          onClick={handleDeleteClick(params.id)}
+          onClick={handleDeleteClick(params)}
         />)
     }
     return gridActionCols
@@ -112,6 +143,12 @@ const Grid = (props) => {
         if (result?.data?.length > 0) {
           let _columns = []
           let keys = Object.keys(result.data[0])
+
+          if (getSession()?.isAppDeveloper === false) {
+            let index = keys.findIndex(e => e.toLowerCase() === 'schoolname')
+            keys.splice(index, 1)
+          }
+
           keys.map((key, index) => {
             if (index > 0 && key === 'id')
               return
@@ -236,9 +273,15 @@ const Grid = (props) => {
       }
     })
 
-  }, [props.api, props.reload, reloadGrid, addActionCols, rows?.length, getSession()?.data, getSession()?.isSuperAdmin, getSession()?.schoolID])
+  }, [props.api, props.reload, reloadGrid, addActionCols, rows?.length,])
   return (
     <Box display="flex" height={600} marginTop={3} >
+      <ConfirmModal
+        show={showConfirmModal}
+        handleClose={handleConfirmModalClose}
+        handleConfirm={handleConfirmModalConfirm}
+        message={confirmationMesssage}
+      />
       <DataGrid
         initialState={{
           columns: {

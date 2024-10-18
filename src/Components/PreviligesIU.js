@@ -10,9 +10,11 @@ import * as Yup from 'yup';
 import Dropdown from './Controls/Dropdown'
 import FetchData from '../Hooks/FetchData'
 import Alert from 'react-bootstrap/Alert';
+import useSession from '../Context/SessionContext'
 
 
 function PreviligesIU(props) {
+    const [getSession, setSession] = useSession()
     const [isVisible, setVisible] = useState(false)
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -23,14 +25,16 @@ function PreviligesIU(props) {
     });
 
     const formik = useFormik({
-        initialValues: {
-            PreviligeID: -1,
-            SchoolID: -1,
-            PreviligeName: "",
-        },
+        enableReinitialize: true,  // This ensures the form will reinitialize when the userData changes
         validationSchema,
         validateOnChange: true,
         validateOnBlur: false,
+        initialValues: {
+            PreviligeID: props?.editRow?.PreviligeID || -1,
+            SchoolID: props?.editRow?.FKSchoolID || -1,
+            PreviligeName: props?.editRow?.PreviligeName || "",
+        },
+
         onSubmit: (data) => {
             let httpMethod = props.editRow?.PreviligeID > 0 ? 'put' : 'post'
             let endpoint = 'previlige'
@@ -41,7 +45,6 @@ function PreviligesIU(props) {
                     "SchoolID": data.SchoolID,
                 }
             }
-
 
             FetchData(endpoint, httpMethod, body, (result) => {
                 if (!result.data.error) {
@@ -57,17 +60,10 @@ function PreviligesIU(props) {
     });
 
     useEffect(() => {
-        if (props.editRow?.PreviligeID > -1) {
+        if (props?.editRow?.PreviligeID > -1) {
             showModal()
-            formik.initialValues.SchoolID = props.editRow.FKSchoolID
-            formik.initialValues.PreviligeID = props.editRow.PreviligeID
-            formik.initialValues.PreviligeName = props.editRow.PreviligeName
-        } else {
-            formik.initialValues.SchoolID = -1
-            formik.initialValues.PreviligeID = -1
-            formik.initialValues.PreviligeName = ""
         }
-    }, [props, isVisible, formik, formik.initialValues])
+    }, [props,])
 
     const showModal = () => {
         setVisible(true)
@@ -96,20 +92,21 @@ function PreviligesIU(props) {
                             {message}
                         </Alert>}
                         <div className="">
-                            <div className="form-group">
-                                <label htmlFor="SchoolID">School Name</label>
-                                <Dropdown name="SchoolID"
-                                    api="school"
-                                    keyField='SchoolID'
-                                    valueField='SchoolName'
-                                    selectedValue={formik.values.SchoolID}
-                                    onChange={value => formik.setFieldValue('SchoolID', value.value)}
-                                />
-                                <div className="text-danger">
-                                    {formik.errors.SchoolID ? formik.errors.SchoolID : null}
+                            {getSession()?.isAppDeveloper === false ? '' :
+                                <div className="form-group">
+                                    <label htmlFor="SchoolID">School Name</label>
+                                    <Dropdown name="SchoolID"
+                                        api="school"
+                                        keyField='SchoolID'
+                                        valueField='SchoolName'
+                                        selectedValue={formik.values.SchoolID}
+                                        onChange={value => formik.setFieldValue('SchoolID', value.value)}
+                                    />
+                                    <div className="text-danger">
+                                        {formik.errors.SchoolID ? formik.errors.SchoolID : null}
+                                    </div>
                                 </div>
-                            </div>
-
+                            }
                             <div className="form-group">
                                 <label htmlFor="PreviligeName">Role Name</label>
                                 <input
