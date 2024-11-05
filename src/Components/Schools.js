@@ -5,10 +5,10 @@ import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
 import SchoolsIU from './SchoolsIU'
 import Alert from 'react-bootstrap/Alert';
-import SessionContext from '../Context/SessionContext'
+import useSession from '../Context/SessionContext'
 
 function Schools() {
-    const { session } = useContext(SessionContext);
+   const [getSession, setSession] = useSession()
     const [editRow, setEditRow] = useState({})
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -46,24 +46,32 @@ function Schools() {
             <Header />
             <Sidebar />
             <main id="main" className="main">
-                <div className="pagetitle">
-                    <h1>Manage Schools</h1>
-                </div>
+
                 <section className="section">
                     <div className="card">
                         <div className="card-header">
-                            <Alert key={alertType} variant={alertType}>
+                            <div className='row mb-2'>
+                                <div className='col'>
+                                    <div className="pagetitle">
+                                        <h1>Manage Schools</h1>
+                                    </div>
+                                </div>
+                                <div className='col'>
+                                    <SchoolsIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen} />
+                                </div>
+                            </div>
+                            <Alert className='m-0 p-2' key={alertType} variant={alertType}>
                                 {message}
                             </Alert>
-                            <SchoolsIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen}/>
                         </div >
                         <div className="card-body">
-                            <Grid api={session.isAppDeveloper === true ? `school` : `school/${session.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
+                            <Grid api={getSession()?.isAppDeveloper === true ? `school` : `school/${getSession()?.schoolID}`} editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
                         </div>
                     </div>
                 </section>
             </main>
-        </>);
+        </>
+    )
 }
 
 export default Schools;

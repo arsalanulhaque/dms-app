@@ -22,14 +22,15 @@ function SchoolsIU(props) {
     });
 
     const formik = useFormik({
-        initialValues: {
-            SchoolID: -1,
-            SchoolName: "",
-            Address: "",
-        },
+        enableReinitialize: true,  // This ensures the form will reinitialize when the userData changes
         validationSchema,
         validateOnChange: true,
         validateOnBlur: false,
+        initialValues: {
+            SchoolID: props?.editRow?.SchoolID || -1,
+            SchoolName: props?.editRow?.SchoolName || "",
+            Address: props?.editRow?.Address || "",
+        },
         onSubmit: (data) => {
             let httpMethod = props.editRow?.SchoolID > 0 ? 'put' : 'post'
             let endpoint = 'school'
@@ -56,17 +57,10 @@ function SchoolsIU(props) {
     });
 
     useEffect(() => {
-        if (props.editRow?.SchoolID > -1) {
+        if (props?.editRow?.SchoolID > -1) {
             showModal()
-            formik.initialValues.SchoolID = props.editRow.SchoolID
-            formik.initialValues.SchoolName = props.editRow.SchoolName
-            formik.initialValues.Address = props.editRow.Address
-        } else {
-            formik.initialValues.SchoolID = -1
-            formik.initialValues.SchoolName = ""
-            formik.initialValues.Address = ""
-        }
-    }, [props, isVisible, formik, formik.initialValues])
+        } 
+    }, [props, ])
 
     const showModal = () => {
         setVisible(true)
@@ -82,7 +76,7 @@ function SchoolsIU(props) {
 
     return (
         <>
-            <button type="button" className="btn btn-primary mt-3 float-end" onClick={showModal}>
+            <button type="button" className="btn btn-primary float-end" onClick={showModal}>
                 Add New School
             </button>
             <Modal show={isVisible} size="lg" dialogClassName={"primaryModal"}>

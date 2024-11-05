@@ -10,8 +10,10 @@ import * as Yup from 'yup';
 import Dropdown from './Controls/Dropdown'
 import FetchData from '../Hooks/FetchData'
 import Alert from 'react-bootstrap/Alert';
+import useSession from '../Context/SessionContext'
 
 function UsersIU(props) {
+    const [getSession, setSession] = useSession()
     const [isVisible, setVisible] = useState(false)
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -29,20 +31,21 @@ function UsersIU(props) {
     });
 
     const formik = useFormik({
-        initialValues: {
-            UserID: -1,
-            SchoolID: -1,
-            PreviligeID: -1,
-            EmailID: "",
-            Username: "",
-            Password: "",
-            FirstName: "",
-            LastName: "",
-            NfcID: "",
-        },
-        validationSchema: validationSchema,
+        enableReinitialize: true,  // This ensures the form will reinitialize when the userData changes
+        validationSchema,
         validateOnChange: true,
         validateOnBlur: false,
+        initialValues: {
+            UserID: props?.editRow?.UserID || -1,
+            SchoolID: props?.editRow?.FKSchoolID || -1,
+            PreviligeID: props?.editRow?.FKPreviligeID || -1,
+            EmailID: props?.editRow?.EmailID || '',
+            Username: props?.editRow?.Username || '',
+            Password: props?.editRow?.Password || '',
+            FirstName: props?.editRow?.FirstName || '',
+            LastName: props?.editRow?.LastName || '',
+            NfcID: props?.editRow?.NfcID || '',
+        },
         onSubmit: (data) => {
             let httpMethod = props.editRow?.UserID > 0 ? 'put' : 'post'
             let endpoint = 'users'
@@ -70,33 +73,13 @@ function UsersIU(props) {
                 }
             })
         },
-
     });
 
     useEffect(() => {
         if (props?.editRow?.UserID > -1) {
             showModal()
-            formik.initialValues.UserID = props?.editRow?.UserID || -1
-            formik.initialValues.SchoolID = props?.editRow?.FKSchoolID || -1
-            formik.initialValues.PreviligeID = props?.editRow?.FKPreviligeID || -1
-            formik.initialValues.EmailID = props?.editRow?.EmailID || ''
-            formik.initialValues.Username = props?.editRow?.Username || ''
-            formik.initialValues.Password = props?.editRow?.Password || ''
-            formik.initialValues.NfcID = props?.editRow?.NfcID || ''
-            formik.initialValues.FirstName = props?.editRow?.FirstName || ''
-            formik.initialValues.LastName = props?.editRow?.LastName || ''
-        } else {
-            formik.initialValues.UserID = -1
-            formik.initialValues.SchoolID = -1
-            formik.initialValues.PreviligeID = -1
-            formik.initialValues.EmailID = ""
-            formik.initialValues.FirstName = ""
-            formik.initialValues.LastName = ""
-            formik.initialValues.Username = ""
-            formik.initialValues.Password = ""
-            formik.initialValues.NfcID = ""
-        }
-    }, [props, isVisible, formik, formik.initialValues])
+        } 
+    }, [props,])
 
     const showModal = () => {
         setVisible(true)
@@ -112,7 +95,7 @@ function UsersIU(props) {
 
     return (
         <>
-            <button type="button" className="btn btn-primary mt-3 float-end" onClick={showModal}>
+            <button type="button" className="btn btn-primary float-end" onClick={showModal}>
                 Add New User
             </button>
             <Modal show={isVisible} size="lg" dialogClassName={"primaryModal"}>
@@ -125,20 +108,21 @@ function UsersIU(props) {
                             {message}
                         </Alert>}
                         <div className="">
-                            <div className="form-group">
-                                <label htmlFor="SchoolID">School Name</label>
-                                <Dropdown name="SchoolID"
-                                    api="school"
-                                    keyField='SchoolID'
-                                    valueField='SchoolName'
-                                    selectedValue={formik.values.SchoolID}
-                                    onChange={value => formik.setFieldValue('SchoolID', value.value)}
-                                />
-                                <div className="text-danger">
-                                    {formik.errors.SchoolID ? formik.errors.SchoolID : null}
+                            {getSession()?.isAppDeveloper === false ? '' :
+                                <div className="form-group">
+                                    <label htmlFor="SchoolID">School Name</label>
+                                    <Dropdown name="SchoolID"
+                                        api="school"
+                                        keyField='SchoolID'
+                                        valueField='SchoolName'
+                                        selectedValue={formik.values.SchoolID}
+                                        onChange={value => formik.setFieldValue('SchoolID', value.value)}
+                                    />
+                                    <div className="text-danger">
+                                        {formik.errors.SchoolID ? formik.errors.SchoolID : null}
+                                    </div>
                                 </div>
-                            </div>
-
+                            }
                             <div className="form-group">
                                 <label htmlFor="FirstName">First Name</label>
                                 <input
@@ -167,19 +151,6 @@ function UsersIU(props) {
                                 </div>
                             </div>
 
-                            <div className="form-group">
-                                <label htmlFor="Username">User Name</label>
-                                <input
-                                    name="Username"
-                                    type="text"
-                                    className="form-control"
-                                    onChange={formik.handleChange}
-                                    value={formik.values.Username}
-                                />
-                                <div className="text-danger">
-                                    {formik.errors.Username ? formik.errors.Username : null}
-                                </div>
-                            </div>
 
                             <div className="form-group">
                                 <label htmlFor="Username">User Name</label>
@@ -240,10 +211,10 @@ function UsersIU(props) {
                             <div className="form-group">
                                 <label htmlFor="PreviligeID">Role Name</label>
                                 <Dropdown name="PreviligeID"
-                                    api="previlige"
+                                    api={getSession()?.isAppDeveloper === true ? 'previlige' : `previlige/${getSession()?.schoolID}`}
                                     keyField='PreviligeID'
                                     valueField='PreviligeName'
-                                    selectedValue={formik.values.PreviligeID}
+                                    selectedValue={formik.values.PreviligeID  }
                                     onChange={value => formik.setFieldValue('PreviligeID', value.value)}
                                 />
                                 <div className="text-danger">

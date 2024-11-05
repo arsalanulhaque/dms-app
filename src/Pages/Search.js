@@ -1,18 +1,23 @@
+import '../style.css'
 import React, { useContext, useEffect, useState, useRef, } from "react";
-import SessionContext from '../Context/SessionContext'
+import useSession from '../Context/SessionContext'
 import FetchData from '../Hooks/FetchData'
 import Header from '../Components/Header';
+import DeviceList from '../Components/DeviceList';
 import Alert from 'react-bootstrap/Alert';
-import '../style.css'
-import { Link } from "react-router-dom";
+import iconError from '../assets/img/error_icon.png'
+import iconSuccess from '../assets/img/success_icon.png'
 
 function Search() {
     const inputRef = useRef(null);
-    const { session } = useContext(SessionContext);
+   const [getSession, setSession] = useSession()
     const [alertType, setAlertType] = useState('')
     const [message, setMessage] = useState('')
     const [isLoader, setLoader] = useState(false)
-    const [results, setResults] = useState([])
+    const [lstIssuedDevices, setIssuedDevices] = useState([])
+    const [lstAvailableDevices, setAvailableDevices] = useState([])
+    const [lstUnavailableDevices, setUnavailableDevices] = useState([])
+
 
     useEffect(() => {
         let intervalID = setInterval(() => {
@@ -24,321 +29,213 @@ function Search() {
         })
     }, [])
 
-
-
-    const onSubmit = (event) => {
-        event.preventDefault()
-        // reload('search', 'post', inputRef.current.value)
-
+    const onItemScan = (e) => {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            makeRequest(`device/barcode/${inputRef.current.value}/schoolID/${getSession()?.schoolID}`, 'get', undefined)
+        }
     }
 
-    const reload = (api, method, body) => {
+    const makeRequest = (api, method, body) => {
         FetchData(api, method, body, (response) => {
             if (response?.error) {
                 setAlertType('danger')
                 setMessage(response?.data?.message)
             }
             else if (response?.data?.length > 0 || response?.data?.data?.length > 0) {
-                let arr = response?.data
-                let isExists = results.findIndex(item => item.AssetID === arr[0].AssetID)
-                if (isExists === -1) {
-                    let spreaded = [...arr, ...results]
-                    spreaded = [...new Set(spreaded)]
-                    setResults(spreaded)
-
-                    setAlertType('success')
-                    setMessage('')
-                }
+                let device = response?.data[0]
+                //Available devices
+                addToAvailableDevices(device)
+                //Devices issued to logged in user
+                addToIssuedDevices(device)
+                //Devices reserved by someone else
+                addToOccupiedDevices(device)
             }
         })
         inputRef.current.value = ''
     }
 
-    const onScanItem = (e) => {
-        if (e.key === 'Enter' || e.keyCode === 13) {
-            if (results.length === 0) {
-                reload(`device/barcode/${inputRef.current.value}`, 'get', undefined)
-                findItemInList()
+    const addToAvailableDevices = (device) => {
+        if (device.Username === null) {
+            if (!isDeviceInList(device, lstAvailableDevices) && lstIssuedDevices.length === 0) {
+                device.UserID = getSession()?.userID
+                device.EmailID = getSession()?.emailID
+                device.Username = getSession().data[0]?.Username
+                let spreaded = [...lstAvailableDevices, device]
+                spreaded.sort((a, b) => (a.IsIssued > b.IsIssued) ? 1 : ((b.IsIssued > a.IsIssued) ? -1 : 0))
+                setSelectedOnScan(spreaded)
+                setAvailableDevices(spreaded)
             }
-            else if (results.length > 0) { findItemInList() }
-        }
-    }
-
-    //Insert in bulk in Device Status Table to Book devices 
-    const bulkInsert = async () => {
-        setLoader(true)
-        let httpMethod = 'post'
-        let endpoint = 'bulkinsertdevicestatus'
-        let body = {
-            "devicestatus": {
-                SchoolID: session.schoolID,
-                UserID: session.userID,
-                EmailID: session.emailID,
-                Rows: results,
-            }
-        }
-
-        await FetchData(endpoint, httpMethod, body, (result) => {
-            if (result?.data?.error) {
+            else {
                 setAlertType('danger')
-                setMessage("Something wrong went!")
-                return false
-            }
-            else {
-                setResults([])
-                setAlertType('success')
-                setMessage("Device has been issued successfully.")
-            }
-            setLoader(false)
-        })
-    }
-
-    //Return in bulk in Device Status Table to Book devices 
-    const bulkReturn = async () => {
-        setLoader(true)
-        let httpMethod = 'post'
-        let endpoint = 'bulkinsertdevicestatus'
-        let body = {
-            "devicestatus": {
-                SchoolID: session.schoolID,
-                UserID: session.userID,
-                EmailID: session.emailID,
-                Rows: results,
+                setMessage('You can`t take a device while returning devices!')
             }
         }
+    }
 
-        await FetchData(endpoint, httpMethod, body, (result) => {
-            if (result?.data?.error) {
+    const addToIssuedDevices = (device) => {
+        if (device.IsIssued === 1 && device.FKUserID === getSession()?.userID) {
+            if (!isDeviceInList(device, lstIssuedDevices) && lstAvailableDevices.length === 0) {
+                device.UserID = getSession()?.userID
+                device.EmailID = getSession()?.emailID
+                let spreaded = [...lstIssuedDevices, device]
+                spreaded.sort((a, b) => (a.IsIssued > b.IsIssued) ? 1 : ((b.IsIssued > a.IsIssued) ? -1 : 0))
+                setSelectedOnScan(spreaded)
+                setIssuedDevices(spreaded)
+            }
+            else {
                 setAlertType('danger')
-                setMessage("Something wrong went!")
-                return false
+                setMessage('You can`t return a device while booking new devices!')
+            }
+        }
+    }
+
+    const addToOccupiedDevices = (device) => {
+        if (device.IsIssued === 1 && device.FKUserID !== getSession()?.userID) {
+            if (!isDeviceInList(device, lstUnavailableDevices)) {
+                let spreaded = [...lstUnavailableDevices, device]
+                //spreaded = [...new Set(spreaded)]
+                spreaded.sort((a, b) => (a.IsIssued > b.IsIssued) ? 1 : ((b.IsIssued > a.IsIssued) ? -1 : 0))
+                setSelectedOnScan(spreaded)
+                setUnavailableDevices(spreaded)
+            }
+        }
+    }
+
+    const isDeviceInList = (device, list) => {
+        return list.findIndex(item => item.AssetID === device.AssetID) === -1 ? false : true
+    }
+
+    const setSelectedOnScan = (obj) => {
+        obj.forEach(element => {
+            if (element.IssuedDate === null || element.IssuedDate === 1) {
+                element.selected = true
+            } else {
+                element.selected = false
+            }
+        });
+    }
+
+    const handleCheckout = () => {
+        const body = { devices: lstAvailableDevices }
+        FetchData('device/checkout', 'put', body, (response) => {
+            if (response?.error) {
+                setAlertType('danger')
+                setMessage(response?.data?.message)
             }
             else {
-                setResults([])
                 setAlertType('success')
-                setMessage("Device has been issued successfully.")
+                setMessage(response?.data?.message)
+                reset()
             }
-            setLoader(false)
         })
     }
 
-    //Insert new record in Device Status Table 
-    const insertDeviceStatus = async (prod) => {
-        let httpMethod = 'post'
-        let endpoint = 'devicestatus'
-        let body = {
-            "devicestatus": {
-                DeviceID: prod.DeviceID,
-                SchoolID: session.schoolID,
-                UserID: session.userID,
-                EmailID: session.emailID,
-                AssetID: prod.AssetID
-            }
-        }
-
-        await FetchData(endpoint, httpMethod, body, (result) => {
-            if (result?.data?.error) {
-                return false
+    const handleCheckIn = () => {
+        const body = { devices: lstIssuedDevices }
+        FetchData('device/checkin', 'put', body, (response) => {
+            if (response?.error) {
+                setAlertType('danger')
+                setMessage(response?.data?.message)
             }
             else {
-                return true
+                setAlertType('success')
+                setMessage(response?.data?.message)
+                reset()
             }
         })
     }
 
-    //Update return status in Device Status Table 
-    const updateReturnDeviceStatus = async (prod) => {
-        let httpMethod = 'put'
-        let endpoint = 'returndevicestatus'
-        let body = {
-            "devicestatus": {
-                DeviceStatusID: prod.DeviceStatusID,
-                SchoolID: session.schoolID,
-                UserID: session.userID,
-                EmailID: session.emailID,
-                AssetID: prod.AssetID
-            }
-        }
-
-        await FetchData(endpoint, httpMethod, body, (result) => {
-            if (result?.data?.error) {
-                return false
-            }
-            else {
-                return true
-            }
-        })
-    }
-
-    //Update Issued column in Device Table
-    const updateDeviceStatus = async (prod, isIssued) => {
-        let httpMethod = 'put'
-        let endpoint = isIssued === 1 ? 'issuedevice' : 'returndevice'
-        let body = {
-            "device": {
-                DeviceID: prod.FKDeviceID,
-                SchoolID: session.schoolID,
-                IsIssued: isIssued,
-                EmailID: session.emailID,
-                AssetID: prod.AssetID
-            }
-        }
-
-        await FetchData(endpoint, httpMethod, body, (result) => {
-            if (result?.data?.error) {
-                return false
-            }
-            else {
-                return true
-            }
-        })
-    }
-
-
-    const onBookDevice = async (prod) => {
-        setLoader(true)
-        let flag = false
-        if (insertDeviceStatus(prod)) {
-            setTimeout(() => {
-                if (updateDeviceStatus(prod, 1)) {
-                    flag = true
-                }
-
-                if (flag) {
-                    setResults([])
-                    setAlertType('success')
-                    setMessage("Device has been issued successfully.")
-                }
-                else {
-                    setAlertType('danger')
-                    setMessage("Something wrong went!")
-                }
-                setLoader(false)
-            }, 3000);
-        }
-    }
-
-    const onReturnDevice = async (prod) => {
-        setLoader(true)
-        let flag = false
-        if (updateReturnDeviceStatus(prod)) {
-            setTimeout(() => {
-                if (updateDeviceStatus(prod, 0)) {
-                    flag = true
-                }
-
-                if (flag) {
-                    setResults([])
-                    setAlertType('success')
-                    setMessage("Device has been returned successfully.")
-                }
-                else {
-                    setAlertType('danger')
-                    setMessage("Something wrong went!")
-                }
-                setLoader(false)
-            }, 3000);
-        }
-    }
-
-    const findItemInList = () => {
-        let updateSelection = results.map((obj) => {
-            if (obj.BarCode === inputRef.current.value) {
-                if (obj['selected'] === undefined)
-                    obj.selected = true
-                else
-                    obj.selected = !obj.selected
-            }
-            return obj
-        })
-        setResults(updateSelection)
-        inputRef.current.value = ''
+    const reset = () => {
+        setIssuedDevices([...new Set([])])
+        setAvailableDevices([...new Set([])])
+        setUnavailableDevices([...new Set([])])
     }
 
     return (
         <>
+            <input type="text" ref={inputRef} className="hidden-form-control" onKeyDown={onItemScan} name="search" />
             <Header />
-            <div className="container">
-                <div className=" justify-content-md-center align-items-center search">
-                    <div className="row w-100 ">
-                        <form onSubmit={onSubmit}>
-                            <div className="d-flex rounded justify-content-md-center align-items-center">
-                                <div className="input-group input-group-lg">
-                                    <Link to='/managedevicestatus' >Show Devices</Link>
-                                    <input type="text" ref={inputRef} onKeyDown={onScanItem} className="hidden-form-control" name="search" />
-                                </div>
-                            </div>
-                        </form>
-                        <button className='btn btn-primary' onClick={results.filter(i => i.IsIssued === 0)?.length > 0 ? bulkInsert : bulkReturn}>
-                            {results.filter(i => i.IsIssued === 0)?.length > 0 ? 'Book Now' : 'Return Now'}
-                        </button>
+            <div className="container fill mb-0 search">
+
+                {/* <div className="row border border-bottom-1">
+                    <div className="col my-2">
+                        <Link to='/managedevicestatus'>Check Device Status</Link>
                     </div>
-                </div>
+                    <div className="col p-2">
+
+                    </div>
+                    <div className="col-1 d-flex justify-content-end p-2">
+                        <button type="button" className="btn btn-sm btn-danger" onClick={() => reset()}>Remove All</button>
+                    </div>
+                </div> */}
+                {
+                    message?.length === 0 ? '' :
+                        <div className="row justify-content-center">
+                            <div className="col-6">
+
+                                <Alert key={alertType} variant={alertType} className="mt-2"
+                                    onClose={() => {
+                                        setMessage('')
+                                    }} dismissible>
+                                    {alertType === 'danger' ?
+                                        <img src={iconError} alt='' className="icon-48" /> :
+                                        alertType === 'success' ?
+                                            <img src={iconSuccess} alt='' className="icon-48" />
+                                            : ''}
+                                    <span className='px-2 fs-5'>{message}</span>
+                                </Alert>
+                            </div>
+                        </div>
+                }
+
                 {
                     isLoader === true ?
-                        <div className="d-flex rounded justify-content-md-center align-items-center w-100 mt-5 mr-5">
-                            <div className="row h-50 d-inline-block">
-                                <div className="col-12">
-                                    <div className="spinner-border text-primary spinner-big" role="status">
-                                        <span className="sr-only">Loading...</span>
-                                    </div>
+                        <div className="row justify-content-center">
+                            <div className="col-1 align-items-center m-5 p-5">
+                                <div className="spinner-border text-primary spinner-big" role="status">
+                                    <span className="sr-only">Loading...</span>
                                 </div>
                             </div>
                         </div>
-                        : ''
+                        :
+
+                        <div className="row mt-2">
+                            {
+                                lstUnavailableDevices.length > 0 ?
+                                    <div className="col w-100 ">
+                                        <DeviceList state="unavailable" title='Occupied Devices' titleStyle='text-danger' handleCheckout={handleCheckout} products={lstUnavailableDevices} />
+                                    </div> : ''
+                            }
+                            {
+                                lstAvailableDevices.length > 0 ?
+                                    <div className="col w-100 ">
+                                        <DeviceList state="available" title='Available Devices' titleStyle='text-success' handleCheckout={handleCheckout} products={lstAvailableDevices} />
+                                    </div> : ''
+                            }
+                            {
+                                lstIssuedDevices.length > 0 ?
+                                    <div className="col w-100 ">
+                                        <DeviceList state="return" title='Return Devices' titleStyle='text-info' handleCheckin={handleCheckIn} products={lstIssuedDevices} />
+                                    </div> : ''
+                            }
+                        </div>
                 }
+
                 {
-                    message?.length > 0 ?
-                        <div className=" d-flex justify-content-md-center align-items-center search">
-                            <div className="row w-50">
-                                <Alert key={alertType} variant={alertType} className="w-100">
-                                    {message}
-                                </Alert>
+                    lstUnavailableDevices.length === 0 && lstAvailableDevices.length === 0 && lstIssuedDevices.length === 0 ?
+                        <div className="card m-2">
+                            <div className="card-body ">
+                                <div className="row align-items-center justify-content-md-center map m-0 p-0 ">
+                                    <div className="col-md-auto align-items-center text-info">
+                                        <p className='fs-3'>Ready...?</p>
+                                        <p className='fs-5'>Start scanning your devices now!</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         : ''
                 }
             </div>
-            {
-                isLoader === false ?
-                    <div className="container-fluid mt-5">
-                        <div className="row">
-                            {
-                                results?.map((prod) =>
-                                    <div key={prod.AssetID} className="col-4" >
-                                        <div className={prod?.selected ? "card border border-warning border-4 rounded" : "card border border-2 rounded"}>
-                                            <div className="card-body">
-                                                <div className="row card-title bottom border-1 border-bottom" >
-                                                    <div className="col text-primary">
-                                                        <h5 >Asset# {prod.AssetID}</h5>
-                                                    </div>
-                                                    <div className="col-5">
-                                                        {prod.IsIssued === 0 ? <span className="btn-bookNow fs-6 float-end fw-bold text-warning" onClick={() => onBookDevice(prod)}>Book Now</span> : ''}
-                                                        {prod.IsIssued === 1 && prod.FKUserID === session.userID ?
-                                                            <span className="btn-bookNow fs-6 float-end fw-bold text-danger" onClick={() => onReturnDevice(prod)}>Return Now</span> : ''}
-                                                        {prod.IsIssued === 1 && prod.FKUserID !== session.userID ?
-                                                            <span className="btn-already-booked fs-6 float-end fw-bold">Already Booked</span> : ''}
-                                                    </div>
-                                                </div>
-                                                <div className="row">
-                                                    <div className="col">
-                                                        <div className="row">
-                                                            <div className="col-6 card-text">Device Name: {prod.DeviceName}</div>
-                                                            <div className="col-6 card-text">Model: {prod.Model}</div>
-                                                            <div className="col-6 card-text">Staff: {prod.ReturnDate === null ? <span className="fw-bold text-danger">{prod.Username}</span> : 'NA'} </div>
-                                                            <div className="col-6 card-text">Taken On: {prod.ReturnDate === null ? <span className="fw-bold text-danger">{prod.IssuedDate}</span> : 'NA'}</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )
-                            }
-                        </div>
-                    </div>
-                    : ''
-            }
         </>
     );
 }

@@ -11,8 +11,10 @@ import Dropdown from './Controls/Dropdown'
 import FetchData from '../Hooks/FetchData'
 import Alert from 'react-bootstrap/Alert';
 import { CSVLink } from "react-csv";
+import useSession from '../Context/SessionContext'
 
 function DeviceIU(props) {
+    const [getSession, setSession] = useSession()
     const [isVisible, setVisible] = useState(false)
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -23,23 +25,24 @@ function DeviceIU(props) {
         DeviceName: Yup.string().required('Device name is required'),
         Model: Yup.string().required('Model is required'),
         AssetID: Yup.string().required('Asset ID is required'),
-        BarCode:Yup.string().min(6,'Minimum 6 characters long Bar Code are allowed')
+        BarCode: Yup.string().min(6, 'Minimum 6 characters long Bar Code are allowed')
     });
 
     const formik = useFormik({
-        initialValues: {
-            SchoolID: -1,
-            IMEI: "",
-            DeviceName: "",
-            SchoolName: "",
-            Model: "",
-            AssetID: "",
-            BarCode: "",
-            IsIssued: false
-        },
+        enableReinitialize: true,  // This ensures the form will reinitialize when the userData changes
         validationSchema,
         validateOnChange: true,
         validateOnBlur: false,
+        initialValues: {
+            SchoolID: props?.editRow?.FKSchoolID || -1,
+            IMEI: props?.editRow?.MacAddress || "",
+            DeviceName: props?.editRow?.DeviceName || "",
+            SchoolName: "",
+            Model: props?.editRow?.Model || "",
+            AssetID: props?.editRow?.AssetID || "",
+            BarCode: props?.editRow?.BarCode || "",
+            IsIssued: props?.editRow?.IsIssued === 1 ? true : false || false,
+        },
         onSubmit: (data) => {
             let httpMethod = props.editRow?.DeviceID > 0 ? 'put' : 'post'
             let endpoint = 'device'
@@ -52,7 +55,7 @@ function DeviceIU(props) {
                     "Model": data.Model,
                     "AssetID": data.AssetID,
                     "BarCode": data.BarCode,
-                    "IsIssued": data.IsIssued === 'checked' ? 1 : 0,
+                    "IsIssued": data.IsIssued,
                 }
             }
 
@@ -72,23 +75,9 @@ function DeviceIU(props) {
     useEffect(() => {
         if (props.editRow?.DeviceID > -1) {
             showModal()
-            formik.initialValues.SchoolID = props.editRow.FKSchoolID
-            formik.initialValues.IMEI = props.editRow["MacAddress"]
-            formik.initialValues.DeviceName = props.editRow.DeviceName
-            formik.initialValues.Model = props.editRow.Model
-            formik.initialValues.AssetID = props.editRow.AssetID
-            formik.initialValues.BarCode = props.editRow.BarCode
-            formik.initialValues.IsIssued = props.editRow.IsIssued === 1 ? 'checked' : 'unchecked'
-        } else {
-            formik.initialValues.SchoolID = -1
-            formik.initialValues.IMEI = ''
-            formik.initialValues.DeviceName = ''
-            formik.initialValues.Model = ''
-            formik.initialValues.AssetID = ''
-            formik.initialValues.BarCode = ''
-            formik.initialValues.IsIssued = 'unchecked'
         }
-    }, [formik, formik.initialValues, props, isVisible])
+        console.log(formik.values)
+    }, [props, formik])
 
     const showModal = () => {
         setVisible(true)
@@ -105,7 +94,7 @@ function DeviceIU(props) {
 
     return (
         <>
-            <button type="button" className="btn btn-primary mt-3 float-end" onClick={showModal}>
+            <button type="button" className="btn btn-primary float-end" onClick={showModal}>
                 Add New Device
             </button>
             <Modal show={isVisible} size="lg" dialogClassName={"primaryModal"}>
@@ -118,20 +107,22 @@ function DeviceIU(props) {
                             {message}
                         </Alert>}
                         <div className="">
-                            <div className="form-group">
-                                <label htmlFor="SchoolID">School Name</label>
-                                <Dropdown name="SchoolID"
-                                    api="school"
-                                    keyField='SchoolID'
-                                    valueField='SchoolName'
-                                    selectedValue={formik.values.SchoolID}
-                                    onChange={value => formik.setFieldValue('SchoolID', value.value)}
-                                />
-                                <div className="text-danger">
-                                    {formik.errors.SchoolID ? formik.errors.SchoolID : null}
-                                </div>
-                            </div>
 
+                            {getSession()?.isAppDeveloper === false ? '' :
+                                <div className="form-group">
+                                    <label htmlFor="SchoolID">School Name</label>
+                                    <Dropdown name="SchoolID"
+                                        api="school"
+                                        keyField='SchoolID'
+                                        valueField='SchoolName'
+                                        selectedValue={formik.values.SchoolID}
+                                        onChange={value => formik.setFieldValue('SchoolID', value.value)}
+                                    />
+                                    <div className="text-danger">
+                                        {formik.errors.SchoolID ? formik.errors.SchoolID : null}
+                                    </div>
+                                </div>
+                            }
                             <div className="form-group">
                                 <label htmlFor="IMEI">Mac Address</label>
                                 <input
@@ -208,13 +199,13 @@ function DeviceIU(props) {
 
                             <div className="form-group form-check">
                                 <input
-                                    name="Issued"
+                                    name="IsIssued"
                                     type="checkbox"
                                     className="form-check-input"
                                     onChange={formik.handleChange}
-                                    checked={formik.values.IsIssued}
+                                    checked={formik.values?.IsIssued}
                                 />
-                                <label htmlFor="Issued" className="form-check-label">
+                                <label htmlFor="IsIssued" className="form-check-label">
                                     Device Issued Status
                                 </label>
                             </div>

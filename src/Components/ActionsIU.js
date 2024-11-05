@@ -20,13 +20,14 @@ function ActionsIU(props) {
     });
 
     const formik = useFormik({
-        initialValues: {
-            ActionID: -1,
-            ActionName: "",
-        },
+        enableReinitialize: true,  // This ensures the form will reinitialize when the userData changes
         validationSchema,
         validateOnChange: true,
         validateOnBlur: false,
+        initialValues: {
+            ActionID: props?.editRow?.ActionID || -1,
+            ActionName: props?.editRow?.ActionName || "",
+        },
         onSubmit: (data) => {
             let httpMethod = props.editRow?.ActionID > -1 ? 'put' : 'post'
             let endpoint = 'actions'
@@ -50,15 +51,10 @@ function ActionsIU(props) {
     });
 
     useEffect(() => {
-        if (props.editRow?.ActionID > -1) {
+        if (props?.editRow?.ActionID > -1) {
             showModal()
-            formik.initialValues.ActionID = props.editRow.ActionID
-            formik.initialValues.ActionName = props.editRow.ActionName
-        } else {
-            formik.initialValues.ActionID = -1
-            formik.initialValues.ActionName = ""
         }
-    }, [props, isVisible, formik, formik.initialValues])
+    }, [props,])
 
     const showModal = () => {
         setVisible(true)
@@ -74,7 +70,7 @@ function ActionsIU(props) {
 
     return (
         <>
-            <button type="button" className="btn btn-primary mt-3 float-end" onClick={showModal}>
+            <button type="button" className="btn btn-primary float-end" onClick={showModal}>
                 Add New Action
             </button>
             <Modal show={isVisible} size="lg" dialogClassName={"primaryModal"}>

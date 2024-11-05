@@ -2,36 +2,35 @@
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
-import SessionContext from '../Context/SessionContext'
-import React, { useContext } from 'react';
+import useSession from '../Context/SessionContext'
+import React from 'react';
 
 function DeviceStatus() {
-    const { session } = useContext(SessionContext);
+    const [getSession, setSession] = useSession()
 
     return (
         <>
             <Header />
             <Sidebar />
             <main id="main" className="main">
-                <div className="pagetitle">
-                    <h1>Device History</h1>
-                </div>
-                {/* <!-- End Page Title --> */}
+
                 <section className="section">
-                    <div className="row">
-                        <div className="col">
-                            {/* <!--Content Start -- > */}
-                            <div className="card">
-                                <div className="card-body">
-                                    <Grid api={session.isAppDeveloper === true ? `devicestatus` : `devicestatus/school/${session.schoolID}`} />
+                    <div className="card">
+                        <div className="card-header">
+                            <div className='row mb-2'>
+                                <div className='col'>
+                                    <div className="pagetitle">
+                                        <h1>Device History</h1>
+                                    </div>
                                 </div>
                             </div>
-                            {/* <!--Content End -- > */}
+                        </div>
+                        <div className="card-body">
+                            <Grid api={getSession()?.isAppDeveloper === true ? `devicestatus` : `devicestatus/school/${getSession()?.schoolID}`} />
                         </div>
                     </div>
-                </section>
-
-            </main>
+                </section >
+            </main >
         </>
     );
 }

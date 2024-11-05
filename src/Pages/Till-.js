@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState, useRef, } from "react";
 import SessionContext from '../Context/SessionContext'
 import FetchData from '../Hooks/FetchData'
 import Header from '../Components/Header';
-import iconSearch from '../assets/img/search.png'
 import Alert from 'react-bootstrap/Alert';
 import '../style.css'
 import { Link } from "react-router-dom";
@@ -25,48 +24,40 @@ function Till() {
         })
     }, [])
 
-    const reset = () => {
-        setResults([])
-        setAlertType('info')
-        setMessage('')
-        inputRef.current.value=''
-    }
-
     const onSubmit = (event) => {
         event.preventDefault()
-        console.log(inputRef.current.value)
-        setTimeout(() => {
-            reset() 
-            console.log(inputRef.current.value)
-
-        }, 2000);
-        // reload('search', 'post', event)
     }
 
-    const reload = (api, method, event) => {
-        let httpMethod = method
-        let endpoint = api
-        let body
-        if (event != undefined) {
-            body = {
-                "Criteria": {
-                    input: event.target[0].value,
-                    schoolID: session.schoolID
+    const reload = (api, method, body) => {
+        FetchData(api, method, body, (response) => {
+            if (response?.error) {
+                setAlertType('danger')
+                setMessage(response?.data?.message)
+            }
+            else if (response?.data?.length > 0 || response?.data?.data?.length > 0) {
+                let arr = response?.data
+                let isExists = results.findIndex(item => item.AssetID === arr[0].AssetID)
+                if (isExists === -1) {
+                    let spreaded = [...arr, ...results]
+                    spreaded = [...new Set(spreaded)]
+                    setResults(spreaded)
+
+                    setAlertType('success')
+                    setMessage('')
                 }
             }
-        }
-        FetchData(endpoint, httpMethod, body, (result) => {
-            if (result?.error) {
-                setAlertType('danger')
-                setMessage(result?.data?.message)
-            }
-            else {
-                setResults(api === 'search' ? result?.data?.data : result?.data)
-                setAlertType('success')
-                setMessage('')
-            }
         })
+        inputRef.current.value = ''
+    }
 
+    const onScanItem = (e) => {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            if (results.length === 0) {
+                reload(`device/barcode/${inputRef.current.value}/schoolID/${getSession()?.schoolID}`, 'get', undefined)
+                findItemInList()
+            }
+            else if (results.length > 0) { findItemInList() }
+        }
     }
 
     return (
@@ -79,7 +70,7 @@ function Till() {
                             <div className="d-flex rounded justify-content-md-center align-items-center">
                                 <div className="input-group input-group-lg">
                                     <Link to='/managedevicestatus' >Show Devices</Link>
-                                    <input type="text" ref={inputRef} className="hidden-form-control" name="search" />
+                                    <input type="text" ref={inputRef} onKeyDown={onScanItem} className="hidden-form-control" name="search" />
                                 </div>
                             </div>
                         </form>
@@ -125,9 +116,9 @@ function Till() {
                                                     </div>
                                                     <div className="col-5">
                                                         {/* {prod.IsIssued === 0 ? <span className="btn-bookNow fs-6 float-end fw-bold text-warning" onClick={() => onBookDevice(prod)}>Book Now</span> : ''}
-                                                        {prod.IsIssued === 1 && prod.FKUserID === session.userID ?
+                                                        {prod.IsIssued === 1 && prod.FKUserID === getSession()?.userID ?
                                                             <span className="btn-bookNow fs-6 float-end fw-bold text-danger" onClick={() => onReturnDevice(prod)}>Return Now</span> : ''} */}
-                                                        {prod.IsIssued === 1 && prod.FKUserID !== session.userID ?
+                                                        {prod.IsIssued === 1 && prod.FKUserID !== getSession()?.userID ?
                                                             <span className="btn-already-booked fs-6 float-end fw-bold">Already Booked</span> : ''}
                                                     </div>
                                                 </div>
@@ -136,8 +127,8 @@ function Till() {
                                                         <div className="row">
                                                             <div className="col-6 card-text">Device Name: {prod.DeviceName}</div>
                                                             <div className="col-6 card-text">Model: {prod.Model}</div>
-                                                            <div className="col-6 card-text">Staff: {prod.ReturnDate === null ? <span className="fw-bold text-danger">{prod.Username}</span> : 'NA'} </div>
-                                                            <div className="col-6 card-text">Taken On: {prod.ReturnDate === null ? <span className="fw-bold text-danger">{prod.IssuedDate}</span> : 'NA'}</div>
+                                                            <div className="col-6 card-text">Staff: {prod.Username === '' ? 'NA' : <span className="fw-bold text-danger">{prod.Username}</span>} </div>
+                                                            <div className="col-6 card-text">Taken On: {prod.Username === '' ? 'NA' : <span className="fw-bold text-danger">{prod.IssuedDate}</span> }</div>
                                                         </div>
                                                     </div>
                                                 </div>

@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
@@ -22,7 +22,7 @@ function Actions() {
             setReload(false)
 
     }
-    
+
     const handleModalClosed = (message, alertType, isClosed) => {
         if (isClosed) {
             setEditRow(null)
@@ -43,16 +43,23 @@ function Actions() {
             <Header />
             <Sidebar />
             <main id="main" className="main">
-                <div className="pagetitle">
-                    <h1>Manage Actions</h1>
-                </div>
+
                 <section className="section">
                     <div className="card">
                         <div className="card-header">
-                            <Alert key={alertType} variant={alertType}>
+                            <div className='row mb-2'>
+                                <div className='col'>
+                                    <div className="pagetitle">
+                                        <h1>Manage Actions</h1>
+                                    </div>
+                                </div>
+                                <div className='col'>
+                                    <ActionsIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen} />
+                                </div>
+                            </div>
+                            <Alert className='m-0 p-2' key={alertType} variant={alertType}>
                                 {message}
                             </Alert>
-                            <ActionsIU editRow={editRow} handleModalClosed={handleModalClosed} handleModalOpen={handleModalOpen}/>
                         </div >
                         <div className="card-body">
                             <Grid api='actions' editRow={editRowAction} deleteRow={handleRowDelete} reload={reloadGrid} />
@@ -60,7 +67,8 @@ function Actions() {
                     </div>
                 </section>
             </main>
-        </>);
+        </>
+    )
 }
 
 export default Actions;
