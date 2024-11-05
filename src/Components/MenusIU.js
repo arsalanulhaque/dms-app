@@ -35,7 +35,7 @@ function MenusIU(props) {
             let endpoint = 'menus'
             let body = {
                 "menu": {
-                    "MenuID": data.MenuID,
+                    "MenuID": data.MenuID > -1 ? data.MenuID : null,
                     "MenuName": data.MenuName,
                     "Url": data.Url,
                     "Icon": data.Icon

@@ -35,7 +35,7 @@ function SchoolsIU(props) {
             let endpoint = 'school'
             let body = {
                 "school": {
-                    "SchoolID": data.SchoolID,
+                    "SchoolID": data.SchoolID > 0 ? data.SchoolID : null,
                     "SchoolName": data.SchoolName,
                     "Address": data.Address,
                 }
