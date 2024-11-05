@@ -41,7 +41,7 @@ function PolicyIU(props) {
             let endpoint = 'policy'
             let body = {
                 "pma": {
-                    "PreviligeMenuActionsID": data.PreviligeMenuActionsID > -1 ? data.PreviligeMenuActionsID : null,
+                    "PreviligeMenuActionsID": props.editRow?.PreviligeMenuActionsID > -1 ? data.PreviligeMenuActionsID : null,
                     "PreviligeID": data.PreviligeID,
                     "PreviligeMenuID": data.PreviligeMenuID,
                     "PreviligeActionID": data.PreviligeActionID
