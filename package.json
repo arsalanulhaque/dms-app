@@ -38,7 +38,7 @@
     "eject": "react-scripts eject",
     "start:dev": "env-cmd -f .env.development react-scripts start",
     "start:prod": "env-cmd -f .env.production react-scripts start",
-    "build:prod": "env-cmd -f .env.production npm run build-css && react-scripts build"
+    "build:prod": "env-cmd -f .env.production npm run build"
   },
   "eslintConfig": {
     "extends": [
