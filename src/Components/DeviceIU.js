@@ -20,7 +20,7 @@ function DeviceIU(props) {
     const [alertType, setAlertType] = useState('')
 
     const validationSchema = Yup.object().shape({
-        SchoolID: Yup.number().min(1, 'School is required'),
+        // SchoolID: Yup.number().min(1, 'School is required'),
         IMEI: Yup.string().required('IMEI is required'),
         DeviceName: Yup.string().required('Device name is required'),
         Model: Yup.string().required('Model is required'),
@@ -34,14 +34,14 @@ function DeviceIU(props) {
         validateOnChange: true,
         validateOnBlur: false,
         initialValues: {
-            SchoolID: props?.editRow?.FKSchoolID || -1,
+            SchoolID: props?.editRow?.FKSchoolID || getSession().schoolID,
             IMEI: props?.editRow?.MacAddress || "",
             DeviceName: props?.editRow?.DeviceName || "",
             SchoolName: "",
             Model: props?.editRow?.Model || "",
             AssetID: props?.editRow?.AssetID || "",
             BarCode: props?.editRow?.BarCode || "",
-            IsIssued: props?.editRow?.IsIssued === 1 ? true : false || false,
+            IsIssued: props?.editRow?.IsIssued === 1 ? true : false,
         },
         onSubmit: (data) => {
             let httpMethod = props.editRow?.DeviceID > 0 ? 'put' : 'post'
@@ -55,7 +55,7 @@ function DeviceIU(props) {
                     "Model": data.Model,
                     "AssetID": data.AssetID,
                     "BarCode": data.BarCode,
-                    "IsIssued": data.IsIssued,
+                    "IsIssued": data.IsIssued === true ? 1 : 0,
                 }
             }
 
@@ -203,7 +203,7 @@ function DeviceIU(props) {
                                     type="checkbox"
                                     className="form-check-input"
                                     onChange={formik.handleChange}
-                                    checked={formik.values?.IsIssued}
+                                    checked={formik.values?.IsIssued === false ? false : true}
                                 />
                                 <label htmlFor="IsIssued" className="form-check-label">
                                     Device Issued Status

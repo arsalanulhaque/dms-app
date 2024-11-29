@@ -36,7 +36,7 @@ function SchoolsIU(props) {
             let endpoint = 'school'
             let body = {
                 "school": {
-                    "SchoolID": data.SchoolID,
+                    "SchoolID": props.editRow?.SchoolID > 0 ? data.SchoolID : null,
                     "SchoolName": data.SchoolName,
                     "Address": data.Address,
                 }

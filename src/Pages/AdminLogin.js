@@ -37,24 +37,33 @@ function AdminLogin() {
             }
 
             FetchData(endpoint, httpMethod, body, (result) => {
-                if (result?.data?.error) {
-                    setAlertType('danger')
-                    setMessage(result?.data?.message)
-                }
-                else {
-                    let session = {
-                        message: result.data.message,
-                        data: result.data.data,
-                        error: result.data.error,
-                        isAdmin: result.data.data[0].PreviligeName === 'Admin' ? true : false,
-                        isAppDeveloper: result.data.data[0].PreviligeName === 'AppDeveloper' ? true : false,
-                        //getSession()?.isSuperAdmin = result.data.data[0].PreviligeName === 'Super Admin' ? true : false
-                        schoolID: result.data.data[0].SchoolID,
-                        userID: result.data.data[0].UserID,
-                        emailID: result.data.data[0].EmailID,
+                try {
+                    if (result?.data?.error) {
+                        setAlertType('danger')
+                        setMessage(result?.data?.message)
                     }
-                    setSession(session)
-                    navigate(isAdmin || isAppDeveloper? '/dashboard' : '/search')
+                    else if (result?.data) {
+                        let session = {
+                            message: result?.data?.message,
+                            data: result?.data?.data,
+                            error: result?.data?.error,
+                            isAdmin: result?.data?.data[0]?.PreviligeName === 'Admin' ? true : false,
+                            isAppDeveloper: result?.data?.data[0]?.PreviligeName === 'AppDeveloper' ? true : false,
+                            //getSession()?.isSuperAdmin = result.data.data[0].PreviligeName === 'Super Admin' ? true : false
+                            schoolID: result?.data?.data[0]?.SchoolID,
+                            userID: result?.data?.data[0]?.UserID,
+                            emailID: result?.data?.data[0]?.EmailID,
+                        }
+                        setSession(session)
+                        navigate('/dashboard')
+                    }
+                    else {
+                        setAlertType('danger')
+                        setMessage("Something went wrong. Contact App Developer!")
+                    }
+                } catch (ex) {
+                    setAlertType('danger')
+                    setMessage("Something went wrong. Contact App Developer!")
                 }
             })
         },
