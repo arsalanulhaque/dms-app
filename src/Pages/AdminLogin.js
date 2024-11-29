@@ -54,7 +54,7 @@ function AdminLogin() {
                         emailID: result.data.data[0].EmailID,
                     }
                     setSession(session)
-                    navigate('/dashboard')
+                    navigate(isAdmin || isAppDeveloper? '/dashboard' : '/search')
                 }
             })
         },
