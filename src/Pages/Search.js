@@ -10,7 +10,7 @@ import iconSuccess from '../assets/img/success_icon.png'
 
 function Search() {
     const inputRef = useRef(null);
-   const [getSession, setSession] = useSession()
+    const [getSession, setSession] = useSession()
     const [alertType, setAlertType] = useState('')
     const [message, setMessage] = useState('')
     const [isLoader, setLoader] = useState(false)
@@ -92,6 +92,7 @@ function Search() {
     const addToOccupiedDevices = (device) => {
         if (device.IsIssued === 1 && device.FKUserID !== getSession()?.userID) {
             if (!isDeviceInList(device, lstUnavailableDevices)) {
+                device.FKUserID = getSession()?.userID
                 let spreaded = [...lstUnavailableDevices, device]
                 //spreaded = [...new Set(spreaded)]
                 spreaded.sort((a, b) => (a.IsIssued > b.IsIssued) ? 1 : ((b.IsIssued > a.IsIssued) ? -1 : 0))
@@ -116,7 +117,7 @@ function Search() {
     }
 
     const handleCheckout = () => {
-        const body = { devices: lstAvailableDevices }
+        const body = { devices: lstAvailableDevices?.length > 0 ? lstAvailableDevices : lstUnavailableDevices }
         FetchData('device/checkout', 'put', body, (response) => {
             if (response?.error) {
                 setAlertType('danger')

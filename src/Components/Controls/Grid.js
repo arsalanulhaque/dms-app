@@ -155,6 +155,8 @@ const Grid = (props) => {
 
             let temp = {
               field: index === 0 ? 'id' : key,
+              resizable:true,
+              
             }
 
             switch (key) {
@@ -244,6 +246,10 @@ const Grid = (props) => {
               case 'UserPreviligeID':
                 temp.headerName = 'UserPreviligeID'
                 temp.width = 1
+                break;
+              case 'TransferredFrom':
+                temp.headerName = 'Taken Over From'
+                temp.width = 200
                 break;
 
               default:

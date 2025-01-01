@@ -31,8 +31,8 @@ function DeviceList({ state, title, titleStyle, handleCheckout, handleCheckin, p
                     products.map(product => {
                         return <div className={state === 'available' ? "card border border-1 border-success rounded mb-1" :
                             state === 'unavailable' ? "card border border-1 border-danger rounded mb-1 dim" :
-                            state === 'return' ? "card border border-1 border-info rounded mb-1" :
-                                "card border border-1 rounded mb-1"}>
+                                state === 'return' ? "card border border-1 border-info rounded mb-1" :
+                                    "card border border-1 rounded mb-1"}>
                             <div className="card-header p-2">
                                 <div className="row">
                                     <div className="col justify-content-end">
@@ -50,21 +50,30 @@ function DeviceList({ state, title, titleStyle, handleCheckout, handleCheckin, p
                                     <div className="col-6 card-text">Taken On: {product.IssuedDate === null ? 'NA' : <span className="">{product.IssuedDate}</span>}</div>
                                 </div>
                             </div>
-                            {product?.IsIssued === 0 || state === 'return' ? '' :
+                            {/* {product?.IsIssued === 0 || state === 'return' ? <></> :
                                 <div className="card-footer">
-                                    <div className="fst-italic">
-                                        <img src={iconInfo} alt='' className="icon" /> This item was issued to <span className="fw-bold">{product.Username}</span>. Please raise the issue with IT Support!
+                                    <div className="fst-italic text-danger">
+                                        <img src={state === 'unavailable' ? iconWarning : iconInfo} alt='' className="icon" /> This item was issued to <span className="fw-bold">{product.Username}</span>.
                                     </div>
                                 </div>
-                            }
+                            } */}
                         </div>
                     })
                 }
             </div>
             <div className='card-footer p-1 m-1'>
                 {state === 'unavailable' ?
-                    <div className="fst-italic">
-                        <img src={iconWarning} alt='' className="icon-28" /> <span className="text-danger">You are not permitted to keep any device prior to booking in the system!</span>
+                    <div className="row ">
+                        <div className="col fst-italic ">
+                            <img src={iconWarning} alt='' className="icon-28" /> <span className="text-danger">
+                                "Take Over" means, you will be responsible to return these devices!
+                            </span>
+                        </div>
+                        <div className="col-3 ">
+                            {
+                                <button type="button" alt='' className="btn btn-sm btn-danger float-end" onClick={() => { handleCheckout() }}>Take Over</button>
+                            }
+                        </div>
                     </div>
                     :
                     <div className="row ">

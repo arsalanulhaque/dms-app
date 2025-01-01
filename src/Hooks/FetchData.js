@@ -3,7 +3,7 @@ import axios from 'axios';
 const FetchData = async (endpoint, method, body, callback) => {
   try {
     let response = null
-    endpoint = process.env.REACT_APP_API_URL + endpoint
+    endpoint = process.env.REACT_APP_API_URL + '/'+endpoint
     switch (method) {
       case 'get':
         response = await axios.get(endpoint);
