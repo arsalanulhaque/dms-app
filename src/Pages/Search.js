@@ -1,5 +1,7 @@
 import '../style.css'
 import React, { useContext, useEffect, useState, useRef, } from "react";
+import { useNavigate } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import useSession from '../Context/SessionContext'
 import FetchData from '../Hooks/FetchData'
 import Header from '../Components/Header';
@@ -10,6 +12,7 @@ import iconSuccess from '../assets/img/success_icon.png'
 
 function Search() {
     const inputRef = useRef(null);
+    const navigate = useNavigate();
     const [getSession, setSession] = useSession()
     const [alertType, setAlertType] = useState('')
     const [message, setMessage] = useState('')
@@ -158,12 +161,18 @@ function Search() {
             <Header />
             <div className="container fill mb-0 search">
 
-                {/* <div className="row border border-bottom-1">
+                <div className="card m-2 d-flex flex-row align-items-center justify-content-between bg-white px-3 py-2 fw-bold">
+                    <Link to='/dashboard' className="link">Dashboard</Link>
+                    {(lstIssuedDevices.length > 0 || lstAvailableDevices.length > 0 || lstUnavailableDevices.length > 0) && (
+                        <button type="button" className="btn btn-sm btn-danger" onClick={() => reset()}>Remove All</button>
+                    )}
+
+                </div>
+
+
+                {/* <div className="row border border-bottom-1  bg-white">
                     <div className="col my-2">
                         <Link to='/managedevicestatus'>Check Device Status</Link>
-                    </div>
-                    <div className="col p-2">
-
                     </div>
                     <div className="col-1 d-flex justify-content-end p-2">
                         <button type="button" className="btn btn-sm btn-danger" onClick={() => reset()}>Remove All</button>

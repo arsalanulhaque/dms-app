@@ -45,6 +45,7 @@ function UsersIU(props) {
             FirstName: props?.editRow?.FirstName || '',
             LastName: props?.editRow?.LastName || '',
             NfcID: props?.editRow?.NfcID || '',
+            IsAdmin: props?.editRow?.IsAdmin === 1 ? true : false,
         },
         onSubmit: (data) => {
             let httpMethod = props.editRow?.UserID > 0 ? 'put' : 'post'
@@ -60,6 +61,7 @@ function UsersIU(props) {
                     "Password": data.Password,
                     "Username": data.Username,
                     "NfcID": data.NfcID,
+                    "IsAdmin": data.IsAdmin === true ? 1 : 0,
                 }
             }
 
@@ -79,7 +81,7 @@ function UsersIU(props) {
         if (props?.editRow?.UserID > -1) {
             showModal()
         } 
-    }, [props,])
+    }, [props,formik])
 
     const showModal = () => {
         setVisible(true)
@@ -220,6 +222,19 @@ function UsersIU(props) {
                                 <div className="text-danger">
                                     {formik.errors.PreviligeID ? formik.errors.PreviligeID : null}
                                 </div>
+                            </div>
+
+                            <div className="form-group form-check">
+                                <input
+                                    name="IsAdmin"
+                                    type="checkbox"
+                                    className="form-check-input"
+                                    onChange={formik.handleChange}
+                                    checked={formik.values?.IsAdmin === false ? false : true}
+                                />
+                                <label htmlFor="IsAdmin" className="form-check-label">
+                                    Is User an Admin?
+                                </label>
                             </div>
                         </div>
                     </ModalBody>

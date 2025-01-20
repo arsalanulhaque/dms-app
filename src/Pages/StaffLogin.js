@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import Alert from 'react-bootstrap/Alert';
 import iconLogin from '../assets/img/login_icon.png'
 
-function AdminLogin() {
+function StaffLogin() {
     const [getSession, setSession] = useSession();
     const navigate = useNavigate();
     const [alertType, setAlertType] = useState('')
@@ -47,15 +47,16 @@ function AdminLogin() {
                             message: result?.data?.message,
                             data: result?.data?.data,
                             error: result?.data?.error,
-                            isAdmin: result?.data?.data[0]?.IsAdmin === 1 ? true : false,
+                            isAdmin: result?.data?.data[0]?.PreviligeName === 'Admin' ? true : false,
                             isAppDeveloper: result?.data?.data[0]?.PreviligeName === 'AppDeveloper' ? true : false,
+                            //getSession()?.isSuperAdmin = result.data.data[0].PreviligeName === 'Super Admin' ? true : false
                             schoolID: result?.data?.data[0]?.SchoolID,
                             userID: result?.data?.data[0]?.UserID,
                             emailID: result?.data?.data[0]?.EmailID,
+                            previligeID: result?.data?.data[0].PreviligeID
                         }
                         setSession(session)
-                        session.isAdmin === true ? navigate('/dashboard') : navigate('/search')
-                        // navigate('/dashboard')
+                        navigate('/search')
                     }
                     else {
                         setAlertType('danger')
@@ -77,12 +78,12 @@ function AdminLogin() {
                         <div className="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
                             <div className="card mb-3">
                                 <div className="card-header bg-light d-flex flex-row align-items-center">
-                                    <img src={iconLogin} className="icon-48" />
+                                    <img src={iconLogin} alt="" className="icon-48" />
                                     <h1 className="">Login</h1>
                                 </div>
                                 <div className="card-body">
                                     <div className="card-title px-4 ">
-                                        <h5 className="text-center"> Login </h5>
+                                        <h5 className="text-center">Staff's Login Only</h5>
                                     </div>
                                     <form className="row g-3 " onSubmit={formik.handleSubmit}>
                                         <div className="col-12">
@@ -147,4 +148,4 @@ function AdminLogin() {
     );
 }
 
-export default AdminLogin;
+export default StaffLogin;

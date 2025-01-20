@@ -107,7 +107,7 @@ function Login() {
                                 <div className="card-footer bg-light m-0 p-0">
 
                                     <div className="m-2 d-flex flex-column align-items-end justify-content-center ">
-                                        <Link to='/admin' className="link-primary">Login as Admin</Link>
+                                        <Link to='/admin' className="link-primary">Login with Credentials</Link>
                                     </div>
                                 </div>
                             </div>
