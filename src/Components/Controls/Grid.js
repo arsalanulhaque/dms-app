@@ -306,6 +306,11 @@ const Grid = (props) => {
         }}
         rows={rows}
         columns={columns}
+        slots={{ toolbar: GridToolbar }}
+        slotProps={{
+          toolbar: {
+            showQuickFilter: true,
+          }}}
         components={{
           Toolbar: GridToolbar,
         }}
