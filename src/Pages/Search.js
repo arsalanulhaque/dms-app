@@ -46,6 +46,12 @@ function Search() {
             }
             else if (response?.data?.length > 0 || response?.data?.data?.length > 0) {
                 let device = response?.data[0]
+                let session = getSession().data[0]
+                if(device.FKUserID === null) device.FKUserID = session?.UserID
+                if(device.DeviceStatusID=== null) device.DeviceStatusID = -1
+                device.EmailID = session?.EmailID
+                // device.Username = session?.Username
+                device.SupervisorEmailID = session?.SupervisorEmailID
                 //Available devices
                 addToAvailableDevices(device)
                 //Devices issued to logged in user
@@ -60,9 +66,10 @@ function Search() {
     const addToAvailableDevices = (device) => {
         if (device.Username === null) {
             if (!isDeviceInList(device, lstAvailableDevices) && lstIssuedDevices.length === 0) {
-                device.UserID = getSession()?.userID
-                device.EmailID = getSession()?.emailID
-                device.Username = getSession().data[0]?.Username
+                // device.UserID = getSession()?.UserID
+                // device.EmailID = getSession()?.EmailID
+                 device.Username = getSession().data[0]?.Username
+                // device.SupervisorEmailID = getSession().data[0]?.SupervisorEmailID
                 let spreaded = [...lstAvailableDevices, device]
                 spreaded.sort((a, b) => (a.IsIssued > b.IsIssued) ? 1 : ((b.IsIssued > a.IsIssued) ? -1 : 0))
                 setSelectedOnScan(spreaded)
@@ -76,10 +83,10 @@ function Search() {
     }
 
     const addToIssuedDevices = (device) => {
-        if (device.IsIssued === 1 && device.FKUserID === getSession()?.userID) {
+        if (device.IsIssued === 1 && device.FKUserID === getSession()?.data[0].UserID) {
             if (!isDeviceInList(device, lstIssuedDevices) && lstAvailableDevices.length === 0) {
-                device.UserID = getSession()?.userID
-                device.EmailID = getSession()?.emailID
+                // device.UserID = getSession()?.UserID
+                // device.EmailID = getSession()?.EmailID
                 let spreaded = [...lstIssuedDevices, device]
                 spreaded.sort((a, b) => (a.IsIssued > b.IsIssued) ? 1 : ((b.IsIssued > a.IsIssued) ? -1 : 0))
                 setSelectedOnScan(spreaded)
@@ -97,7 +104,7 @@ function Search() {
             if (!isDeviceInList(device, lstUnavailableDevices)) {
                 device.FKUserID = getSession()?.userID
                 let spreaded = [...lstUnavailableDevices, device]
-                //spreaded = [...new Set(spreaded)]
+                spreaded = [...new Set(spreaded)]
                 spreaded.sort((a, b) => (a.IsIssued > b.IsIssued) ? 1 : ((b.IsIssued > a.IsIssued) ? -1 : 0))
                 setSelectedOnScan(spreaded)
                 setUnavailableDevices(spreaded)

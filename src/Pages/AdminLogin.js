@@ -39,8 +39,14 @@ function AdminLogin() {
             FetchData(endpoint, httpMethod, body, (result) => {
                 try {
                     if (result?.data?.error) {
+                        setTimeout(() => {
+                            setAlertType('danger')
+                            setMessage(result?.data?.message)
+                        }, 3000)
+                    }
+                    else if (result?.code === 'ERR_NETWORK') {
                         setAlertType('danger')
-                        setMessage(result?.data?.message)
+                        setMessage(result?.message)
                     }
                     else if (result?.data) {
                         let session = {
@@ -52,10 +58,11 @@ function AdminLogin() {
                             schoolID: result?.data?.data[0]?.SchoolID,
                             userID: result?.data?.data[0]?.UserID,
                             emailID: result?.data?.data[0]?.EmailID,
+                            previligeID: result?.data?.data[0]?.PreviligeID,
+                            supervisorEmailID: result?.data?.data[0]?.SupervisorEmailID
                         }
                         setSession(session)
-                        session.isAdmin === true ? navigate('/dashboard') : navigate('/search')
-                        // navigate('/dashboard')
+                        session?.isAdmin === true ? navigate('/dashboard') : navigate('/search')
                     }
                     else {
                         setAlertType('danger')
@@ -66,8 +73,8 @@ function AdminLogin() {
                     setMessage("Something went wrong. Contact App Developer!")
                 }
             })
-        },
-    });
+        }
+    })
 
     return (
         <div className="container">

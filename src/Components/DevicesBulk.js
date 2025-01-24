@@ -93,8 +93,8 @@ function DevicesBulk() {
                                         <div className="col d-flex justify-content-start align-items-center fs-6 fw-bold">
                                             <img src={iconInfo} className="icon-48" />
                                             <div className="px-3">
-                                                <div class="  text-secondary w-100">Please select an excel file (.xlsx) file to begin! </div>
-                                                <div class="  text-secondary w-100"><a href={`${process.env.PUBLIC_URL}\\Bulk_Device_Template.xlsx`} download="Bulk Device Template.xlsx" className="text-primary">Download</a> the attached excel file to use as template! </div>
+                                                <div className="  text-secondary w-100">Please select an excel file (.xlsx) file to begin! </div>
+                                                <div className="  text-secondary w-100"><a href={`${process.env.PUBLIC_URL}\\Bulk_Device_Template.xlsx`} download="Bulk Device Template.xlsx" className="text-primary">Download</a> the attached excel file to use as template! </div>
                                             </div>
                                         </div>
                                     </div>

@@ -35,39 +35,41 @@ function Login() {
             }
 
             FetchData(endpoint, httpMethod, body, (result) => {
-                if (result?.data?.error) {
-                    setTimeout(() => {
-                        setAlertType('danger')
-                        setMessage(result?.data?.message)
-                    }, 3000)
-                }
-                else {
-                    let _session = {
-                        message: result?.data?.message,
-                        data: result?.data?.data,
-                        error: result?.data?.error,
-                        isAdmin: result?.data?.data[0].PreviligeName === 'Admin' ? true : false,
-                        isAppDeveloper: result?.data?.data[0].PreviligeName === 'AppDeveloper' ? true : false,
-                        //getSession()?.isSuperAdmin = result.data.data[0].PreviligeName === 'Super Admin' ? true : false
-                        schoolID: result?.data?.data[0].SchoolID,
-                        userID: result?.data?.data[0].UserID,
-                        emailID: result?.data?.data[0].EmailID,
-                        previligeID: result?.data?.data[0].PreviligeID
+                try {
+                    if (result?.data?.error) {
+                        setTimeout(() => {
+                            setAlertType('danger')
+                            setMessage(result?.data?.message)
+                        }, 3000)
                     }
-                    setSession(_session)
-
-
-                    if (result.code === 'ERR_NETWORK') {
+                    else if (result?.code === 'ERR_NETWORK') {
                         setAlertType('danger')
                         setMessage(result?.message)
                         inputRef.current.value = ''
                     }
-                    else if (result?.data?.data[0].PreviligeName === 'Staff') {
-                        navigate('/search')
+                    else if (result?.data) {
+                        let session = {
+                            message: result?.data?.message,
+                            data: result?.data?.data,
+                            error: result?.data?.error,
+                            isAdmin: result?.data?.data[0]?.IsAdmin === 1 ? true : false,
+                            isAppDeveloper: result?.data?.data[0]?.PreviligeName === 'AppDeveloper' ? true : false,
+                            schoolID: result?.data?.data[0]?.SchoolID,
+                            userID: result?.data?.data[0]?.UserID,
+                            emailID: result?.data?.data[0]?.EmailID,
+                            previligeID: result?.data?.data[0]?.PreviligeID,
+                            supervisorEmailID: result?.data?.data[0]?.SupervisorEmailID
+                        }
+                        setSession(session)
+                        session?.isAdmin === true ? navigate('/dashboard') : navigate('/search')
                     }
                     else {
-                        navigate('/dashboard')
+                        setAlertType('danger')
+                        setMessage("Something went wrong. Contact App Developer!")
                     }
+                } catch (ex) {
+                    setAlertType('danger')
+                    setMessage("Something went wrong. Contact App Developer!")
                 }
             })
         }

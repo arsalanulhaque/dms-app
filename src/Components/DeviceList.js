@@ -11,14 +11,14 @@ function DeviceList({ state, title, titleStyle, handleCheckout, handleCheckin, p
 
                 <div className="row">
                     <div className="col fst-italic">
-                        <span class={titleStyle}>{title}</span>
+                        <span className={titleStyle}>{title}</span>
                     </div>
                     {
                         state === 'available' ?
                             <div className="col-1 mt-2 mr-1">
                                 <div className="fs-6 ">
                                     <img src={iconBasket} className="icon-28 position-relative" />
-                                    <span class="position-absolute top-0  translate-middle badge rounded-pill bg-danger">{products.length}</span>
+                                    <span className="position-absolute top-0  translate-middle badge rounded-pill bg-danger">{products.length}</span>
                                 </div>
                             </div>
                             : ''

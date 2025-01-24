@@ -1,45 +1,52 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useContext, useState, } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from './Pages/Login'
+import AdminLogin from './Pages/AdminLogin'
 import Register from './Pages/Register'
 import Dashboard from './Pages/Dashboard'
-import Home from './Pages/Search'
+import Search from './Pages/Search'
 
-import Grid from './Components/Controls/Grid'
-
+import Policy from './Components/Policy';
+import Actions from './Components/Actions';
+import Menus from './Components/Menus';
 import Devices from './Components/Devices';
+import DevicesBulk from './Components/DevicesBulk';
 import DeviceStatus from './Components/DeviceStatus';
 import Previliges from './Components/Previliges';
 import Schools from './Components/Schools'
 import Users from './Components/Users';
+import './style.css';
+import {  Routes } from "react-router-dom";
+import { BrowserRouter, Route, } from 'react-router-dom';
 
-function App() {
-  const [state, setState] = useState([]);
 
-  return (<></>);
-    // <div className="container-fluid">
-    //     <BrowserRouter>
-    //       <Routes>
-    //         <Route index path='/' element={<Login />} />
-    //         <Route path='/login' element={<Login />} />
-    //         <Route path='/register' element={<Register />} />
+function AppWrapper() {
 
-    //         <Route path='/dashboard' element={<Dashboard />} />
-    //         <Route path='/home' element={<Home />} />
+  return (
+    <div className="container-fluid">
+      <BrowserRouter>
+        <Routes>
+          <Route index path='/' element={<Login />} />
+          <Route index path='/login' element={<Login />} />
+          <Route path='/admin' element={<AdminLogin />} />
+          <Route path='/register' element={<Register />} />
 
-    //         <Route path='/managedevices' element={<Devices />} />
-    //         <Route path='/managedevicestatus' element={<DeviceStatus />} />
-    //         <Route path='/managepreviliges' element={<Previliges />} />
-    //         <Route path='/manageschools' element={<Schools />} />
-    //         <Route path='/manageusers' element={<Users />} />
+          <Route path='/dashboard' element={<Dashboard />} />
+          <Route path='/search' element={<Search />} />
 
-    //         <Route path='/Grid' element={<Grid api='school' />} />
-    //       </Routes>
-    //     </BrowserRouter>
-
-    // </div >
-  
+          <Route path='/managedevices' element={<Devices />} />
+          <Route path='/managedevicestatus' element={<DeviceStatus />} />
+          <Route path='/managepreviliges' element={<Previliges />} />
+          <Route path='/manageschools' element={<Schools />} />
+          <Route path='/manageusers' element={<Users />} />
+          <Route path='/manageactions' element={<Actions />} />
+          <Route path='/managemenus' element={<Menus />} />
+          <Route path='/managepolicies' element={<Policy />} />
+          <Route path='/uploadbulkdevices' element={<DevicesBulk />} />
+          
+        </Routes>
+      </BrowserRouter>
+    </div >
+  );
 }
 
-export default App;
+export default AppWrapper;

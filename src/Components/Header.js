@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import useSession from '../Context/SessionContext'
-import React, { useContext, useEffect, useState } from "react";
+import React from "react";
 import iconProfile from '../assets/img/profile.png'
 
 function Header() {
@@ -13,10 +13,9 @@ function Header() {
         < header id="header" className="header fixed-top d-flex align-items-center" >
 
             <div className="d-flex align-items-center justify-content-between">
-                <a href="index.html" className="logo d-flex align-items-center">
-                    {/* <img src="assets/img/logo.png" alt="" /> */}
+                <div className="logo d-flex align-items-center">
                     <span className="d-none d-lg-block">Asset Management System</span>
-                </a>
+                </div>
                 <i className="bi bi-list toggle-sidebar-btn"></i>
             </div>
 
