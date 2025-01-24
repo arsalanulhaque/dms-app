@@ -18,6 +18,7 @@ function SchoolsIU(props) {
 
     const validationSchema = Yup.object().shape({
         SchoolName: Yup.string().required('School name is required'),
+        EmailID: Yup.string().email().required('Email is required'),
         Address: Yup.string().required('Address is required'),
     });
 
@@ -30,6 +31,7 @@ function SchoolsIU(props) {
             SchoolID: props?.editRow?.SchoolID || -1,
             SchoolName: props?.editRow?.SchoolName || "",
             Address: props?.editRow?.Address || "",
+            EmailID: props?.editRow?.EmailID || "",
         },
         onSubmit: (data) => {
             let httpMethod = props.editRow?.SchoolID > 0 ? 'put' : 'post'
@@ -39,6 +41,7 @@ function SchoolsIU(props) {
                     "SchoolID": props.editRow?.SchoolID > 0 ? data.SchoolID : null,
                     "SchoolName": data.SchoolName,
                     "Address": data.Address,
+                    "EmailID":data.EmailID,
                 }
             }
 
@@ -100,6 +103,20 @@ function SchoolsIU(props) {
                                 />
                                 <div className="text-danger">
                                     {formik.errors.SchoolName ? formik.errors.SchoolName : null}
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="EmailID">Email ID</label>
+                                <input
+                                    name="EmailID"
+                                    type="email"
+                                    className="form-control"
+                                    onChange={formik.handleChange}
+                                    value={formik.values.EmailID}
+                                />
+                                <div className="text-danger">
+                                    {formik.errors.EmailID ? formik.errors.EmailID : null}
                                 </div>
                             </div>
 
