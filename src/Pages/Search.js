@@ -164,93 +164,82 @@ function Search() {
 
     return (
         <>
-            <input type="text" ref={inputRef} className="hidden-form-control" onKeyDown={onItemScan} name="search" />
             <Header />
-            <div className="container fill mb-0 search">
-
+            <div className="container fill mb-0 search mt-5 pt-4">
                 <div className="card m-2 d-flex flex-row align-items-center justify-content-between bg-white px-3 py-2 fw-bold">
                     <Link to='/dashboard' className="link">Dashboard</Link>
                     {(lstIssuedDevices.length > 0 || lstAvailableDevices.length > 0 || lstUnavailableDevices.length > 0) && (
                         <button type="button" className="btn btn-sm btn-danger" onClick={() => reset()}>Remove All</button>
                     )}
-
+                </div>
+                <div className="px-2">
+                    <input 
+                        type="text" 
+                        ref={inputRef}
+                        className="form-control mb-3"
+                        onKeyDown={onItemScan} 
+                        name="search"
+                        placeholder="Scan or type barcode..."
+                    />
                 </div>
 
-
-                {/* <div className="row border border-bottom-1  bg-white">
-                    <div className="col my-2">
-                        <Link to='/managedevicestatus'>Check Device Status</Link>
-                    </div>
-                    <div className="col-1 d-flex justify-content-end p-2">
-                        <button type="button" className="btn btn-sm btn-danger" onClick={() => reset()}>Remove All</button>
-                    </div>
-                </div> */}
-                {
-                    message?.length === 0 ? '' :
-                        <div className="row justify-content-center">
-                            <div className="col-6">
-
-                                <Alert key={alertType} variant={alertType} className="mt-2"
-                                    onClose={() => {
-                                        setMessage('')
-                                    }} dismissible>
-                                    {alertType === 'danger' ?
-                                        <img src={iconError} alt='' className="icon-48" /> :
-                                        alertType === 'success' ?
-                                            <img src={iconSuccess} alt='' className="icon-48" />
-                                            : ''}
-                                    <span className='px-2 fs-5'>{message}</span>
-                                </Alert>
-                            </div>
+                {message?.length === 0 ? '' :
+                    <div className="row justify-content-center">
+                        <div className="col-6">
+                            <Alert key={alertType} variant={alertType} className="mt-2"
+                                onClose={() => {
+                                    setMessage('')
+                                }} dismissible>
+                                {alertType === 'danger' ?
+                                    <img src={iconError} alt='' className="icon-48" /> :
+                                    alertType === 'success' ?
+                                        <img src={iconSuccess} alt='' className="icon-48" />
+                                        : ''}
+                                <span className='px-2 fs-5'>{message}</span>
+                            </Alert>
                         </div>
+                    </div>
                 }
 
-                {
-                    isLoader === true ?
-                        <div className="row justify-content-center">
-                            <div className="col-1 align-items-center m-5 p-5">
-                                <div className="spinner-border text-primary spinner-big" role="status">
-                                    <span className="sr-only">Loading...</span>
+                {isLoader === true ?
+                    <div className="row justify-content-center">
+                        <div className="col-1 align-items-center m-5 p-5">
+                            <div className="spinner-border text-primary spinner-big" role="status">
+                                <span className="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    :
+                    <div className="row mt-2">
+                        {lstUnavailableDevices.length > 0 &&
+                            <div className="col w-100 ">
+                                <DeviceList state="unavailable" title='Occupied Devices' titleStyle='text-danger' handleCheckout={handleCheckout} products={lstUnavailableDevices} />
+                            </div>
+                        }
+                        {lstAvailableDevices.length > 0 &&
+                            <div className="col w-100 ">
+                                <DeviceList state="available" title='Available Devices' titleStyle='text-success' handleCheckout={handleCheckout} products={lstAvailableDevices} />
+                            </div>
+                        }
+                        {lstIssuedDevices.length > 0 &&
+                            <div className="col w-100 ">
+                                <DeviceList state="return" title='Return Devices' titleStyle='text-info' handleCheckin={handleCheckIn} products={lstIssuedDevices} />
+                            </div>
+                        }
+                    </div>
+                }
+
+                {lstUnavailableDevices.length === 0 && lstAvailableDevices.length === 0 && lstIssuedDevices.length === 0 &&
+                    <div className="card m-2">
+                        <div className="card-body ">
+                            <div className="row align-items-center justify-content-md-center map m-0 p-0 ">
+                                <div className="col-md-auto align-items-center text-info">
+                                    <p className='fs-3'>Ready...?</p>
+                                    <p className='fs-5'>Start scanning your devices now!</p>
                                 </div>
                             </div>
                         </div>
-                        :
-
-                        <div className="row mt-2">
-                            {
-                                lstUnavailableDevices.length > 0 ?
-                                    <div className="col w-100 ">
-                                        <DeviceList state="unavailable" title='Occupied Devices' titleStyle='text-danger' handleCheckout={handleCheckout} products={lstUnavailableDevices} />
-                                    </div> : ''
-                            }
-                            {
-                                lstAvailableDevices.length > 0 ?
-                                    <div className="col w-100 ">
-                                        <DeviceList state="available" title='Available Devices' titleStyle='text-success' handleCheckout={handleCheckout} products={lstAvailableDevices} />
-                                    </div> : ''
-                            }
-                            {
-                                lstIssuedDevices.length > 0 ?
-                                    <div className="col w-100 ">
-                                        <DeviceList state="return" title='Return Devices' titleStyle='text-info' handleCheckin={handleCheckIn} products={lstIssuedDevices} />
-                                    </div> : ''
-                            }
-                        </div>
-                }
-
-                {
-                    lstUnavailableDevices.length === 0 && lstAvailableDevices.length === 0 && lstIssuedDevices.length === 0 ?
-                        <div className="card m-2">
-                            <div className="card-body ">
-                                <div className="row align-items-center justify-content-md-center map m-0 p-0 ">
-                                    <div className="col-md-auto align-items-center text-info">
-                                        <p className='fs-3'>Ready...?</p>
-                                        <p className='fs-5'>Start scanning your devices now!</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        : ''
+                    </div>
                 }
             </div>
         </>
