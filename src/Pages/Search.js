@@ -102,12 +102,12 @@ function Search() {
     const addToOccupiedDevices = (device) => {
         if (device.IsIssued === 1 && device.FKUserID !== getSession()?.userID) {
             if (!isDeviceInList(device, lstUnavailableDevices)) {
-                device.FKUserID = getSession()?.userID
-                let spreaded = [...lstUnavailableDevices, device]
-                spreaded = [...new Set(spreaded)]
-                spreaded.sort((a, b) => (a.IsIssued > b.IsIssued) ? 1 : ((b.IsIssued > a.IsIssued) ? -1 : 0))
-                setSelectedOnScan(spreaded)
-                setUnavailableDevices(spreaded)
+                device.FKUserID = getSession()?.userID;
+                let spreaded = [...lstUnavailableDevices, device];
+                spreaded = [...new Set(spreaded)];
+                spreaded.sort((a, b) => (a.IsIssued > b.IsIssued) ? 1 : ((b.IsIssued > a.IsIssued) ? -1 : 0));
+                setSelectedOnScan(spreaded);
+                setUnavailableDevices(spreaded);
             }
         }
     }
