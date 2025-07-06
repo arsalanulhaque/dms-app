@@ -14,6 +14,7 @@ import DeviceStatus from './Components/DeviceStatus';
 import Previliges from './Components/Previliges';
 import Schools from './Components/Schools'
 import Users from './Components/Users';
+import WeeklyReport from './Components/WeeklyReport';
 import './style.css';
 import {  Routes } from "react-router-dom";
 import { BrowserRouter, Route, } from 'react-router-dom';
@@ -42,6 +43,7 @@ function AppWrapper() {
           <Route path='/managemenus' element={<Menus />} />
           <Route path='/managepolicies' element={<Policy />} />
           <Route path='/uploadbulkdevices' element={<DevicesBulk />} />
+          <Route path='/weekly-report' element={<WeeklyReport />} />
           
         </Routes>
       </BrowserRouter>
