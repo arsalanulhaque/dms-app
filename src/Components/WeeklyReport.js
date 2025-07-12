@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import useSession from "../Context/SessionContext";
@@ -17,6 +17,7 @@ function WeeklyReport() {
   const [selectedEmail, setSelectedEmail] = useState("");
   const [message, setMessage] = useState("");
   const [alertType, setAlertType] = useState("");
+  const [ccEmails, setCcEmails] = useState(Array(5).fill(""));
 
   const adminEmail = getSession()?.emailID;
   const schoolEmail = getSession()?.supervisorEmailID;
@@ -36,6 +37,45 @@ function WeeklyReport() {
     { value: 5, label: "Friday" },
     { value: 6, label: "Saturday" },
   ];
+
+  // Fetch existing settings when component mounts
+  useEffect(() => {
+    const fetchSettings = () => {
+      FetchData(`weekly-email-settings/${getSession()?.schoolID}/${getSession()?.userID}`, "get", null, (result) => {
+        if (!result?.error && result?.data) {
+          const settings = result.data;
+          
+          // Set day
+          const dayOption = days.find(d => d.label === settings.DayOfWeek);
+          if (dayOption) {
+            setSelectedDay(dayOption);
+          }
+
+          // Set time
+          const hour = String(settings.HourOfDay).padStart(2, '0');
+          const minute = String(settings.MinuteOfDay).padStart(2, '0');
+          setSelectedTime(`${hour}:${minute}`);
+
+          // Set email
+          setSelectedEmail(settings.SendToEmail || "");
+
+          // Set CC emails
+          const newCcEmails = [
+            settings.CC1 || "",
+            settings.CC2 || "",
+            settings.CC3 || "",
+            settings.CC4 || "",
+            settings.CC5 || ""
+          ];
+          setCcEmails(newCcEmails);
+        }
+      });
+    };
+
+    if (getSession()?.schoolID && getSession()?.userID) {
+      fetchSettings();
+    }
+  }, [getSession]);
 
   const customStyles = {
     control: (base) => ({
@@ -73,6 +113,7 @@ function WeeklyReport() {
 
     const [hour, minute] = selectedTime.split(":");
 
+    // Create an object with individual cc fields
     const scheduleData = {
       schoolId: getSession()?.schoolID,
       adminId: getSession()?.userID,
@@ -80,6 +121,11 @@ function WeeklyReport() {
       dayOfWeek: selectedDay.label,
       hourOfDay: parseInt(hour),
       minuteOfDay: parseInt(minute),
+      cc1: ccEmails[0] || null,
+      cc2: ccEmails[1] || null,
+      cc3: ccEmails[2] || null,
+      cc4: ccEmails[3] || null,
+      cc5: ccEmails[4] || null
     };
 
     FetchData("weekly-email-settings", "post", scheduleData, (result) => {
@@ -177,6 +223,33 @@ function WeeklyReport() {
                               }
                               isSearchable={false}
                             />
+                          </div>
+
+                          <div className="mb-4">
+                            <label
+                              className="form-label fw-bold mb-2"
+                              style={{ color: "#012970" }}
+                            >
+                              CC Email Addresses
+                            </label>
+                            {[0, 1, 2, 3, 4].map((idx) => (
+                              <input
+                                key={idx}
+                                type="email"
+                                className="form-control form-control-md mb-2"
+                                value={ccEmails[idx] || ""}
+                                onChange={(e) => {
+                                  const updated = [...ccEmails];
+                                  updated[idx] = e.target.value;
+                                  setCcEmails(updated);
+                                }}
+                                style={{ height: "45px" }}
+                                placeholder={`CC Email ${idx + 1} (optional)`}
+                              />
+                            ))}
+                            <div className="small text-muted">
+                              Enter up to 5 different email addresses.
+                            </div>
                           </div>
 
                           <div className="d-grid gap-2 mt-4">
