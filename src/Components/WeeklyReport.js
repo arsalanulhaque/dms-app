@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useState } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import useSession from "../Context/SessionContext";
@@ -7,16 +7,24 @@ import Alert from "react-bootstrap/Alert";
 import Select from "react-select";
 import Card from "react-bootstrap/Card";
 
-
 function WeeklyReport() {
-  const [getSession, setSession] = useSession();
+  const [getSession] = useSession();
   const [selectedDay, setSelectedDay] = useState({
     value: -1,
     label: "Select a day",
   });
   const [selectedTime, setSelectedTime] = useState("12:00");
+  const [selectedEmail, setSelectedEmail] = useState("");
   const [message, setMessage] = useState("");
   const [alertType, setAlertType] = useState("");
+
+  const adminEmail = getSession()?.emailID;
+  const schoolEmail = getSession()?.supervisorEmailID;
+
+  const emailOptions = [
+    { value: schoolEmail, label: `School Email (${schoolEmail})` },
+    { value: adminEmail, label: `Admin Email (${adminEmail})` },
+  ];
 
   const days = [
     { value: -1, label: "Select a day" },
@@ -56,21 +64,25 @@ function WeeklyReport() {
     }),
   };
 
-
   const handleSubmit = () => {
-    if (selectedDay.value === -1) {
-      setMessage("Please select a day");
+    if (selectedDay.value === -1 || !selectedEmail) {
+      setMessage("Please select both a day and an email");
       setAlertType("warning");
       return;
     }
 
+    const [hour, minute] = selectedTime.split(":");
+
     const scheduleData = {
-      day: selectedDay.label,
-      time: selectedTime,
       schoolId: getSession()?.schoolID,
+      adminId: getSession()?.userID,
+      sendToEmail: selectedEmail,
+      dayOfWeek: selectedDay.label,
+      hourOfDay: parseInt(hour),
+      minuteOfDay: parseInt(minute),
     };
 
-    FetchData("weekly-report-schedule", "post", scheduleData, (result) => {
+    FetchData("weekly-email-settings", "post", scheduleData, (result) => {
       if (result?.error) {
         setMessage(result.message || "Failed to save schedule");
         setAlertType("danger");
@@ -80,20 +92,6 @@ function WeeklyReport() {
       }
     });
   };
-
-  // Load existing schedule if any
-  // useEffect(() => {
-  //     FetchData(`weekly-report-schedule/${getSession()?.schoolID}`, 'get', null, (result) => {
-  //         if (result?.data) {
-  //             const schedule = result.data;
-  //             setSelectedTime(schedule.time);
-  //             const dayId = days.find(d => d.label === schedule.day)?.value;
-  //             if (dayId !== undefined) {
-  //                 setSelectedDay({ value: dayId, label: schedule.day });
-  //             }
-  //         }
-  //     });
-  // }, []);
 
   return (
     <>
@@ -140,10 +138,11 @@ function WeeklyReport() {
                               styles={customStyles}
                               options={days}
                               value={selectedDay}
-                              onChange={(e) => setSelectedDay(e.target.value)}
+                              onChange={(option) => setSelectedDay(option)}
                               isSearchable={false}
                             />
                           </div>
+
                           <div className="mb-4">
                             <label
                               className="form-label fw-bold mb-2"
@@ -159,20 +158,41 @@ function WeeklyReport() {
                               style={{ height: "45px" }}
                             />
                           </div>
+
+                          <div className="mb-4">
+                            <label
+                              className="form-label fw-bold mb-2"
+                              style={{ color: "#012970" }}
+                            >
+                              Send Report To
+                            </label>
+                            <Select
+                              styles={customStyles}
+                              options={emailOptions}
+                              value={emailOptions.find(
+                                (e) => e.value === selectedEmail
+                              )}
+                              onChange={(option) =>
+                                setSelectedEmail(option.value)
+                              }
+                              isSearchable={false}
+                            />
+                          </div>
+
                           <div className="d-grid gap-2 mt-4">
                             <button
                               className="btn btn-md"
                               onClick={handleSubmit}
-                              style={{ 
-                                  backgroundColor: '#34A85A',
-                                  color: 'white',
-                                  border: 'none',
-                                  borderRadius: '50px',
-                                  padding: '5px 10px',
-                                  boxShadow: 'none',
-                                  width : "30%",
-                                  marginTop : "10px",
-                                  alignSelf : "center"
+                              style={{
+                                backgroundColor: "#34A85A",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "50px",
+                                padding: "5px 10px",
+                                boxShadow: "none",
+                                width: "30%",
+                                marginTop: "10px",
+                                alignSelf: "center",
                               }}
                             >
                               Save Schedule
