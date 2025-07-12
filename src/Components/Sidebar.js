@@ -1,5 +1,5 @@
 import "../style.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import useSession from "../Context/SessionContext";
 import React, { useEffect, useState } from "react";
 import iconUser from "../assets/img/user.png";
@@ -13,79 +13,95 @@ import iconHome from "../assets/img/home.png";
 import iconWeeklyReport from "../assets/img/report.png";
 import iconBulkUpload from "../assets/img/bulk.png";
 import iconHistory from "../assets/img/history.png";
+import iconReminder from "../assets/img/bell-icon.png";
+
+// Icon mapping for optimization
+const iconMap = {
+  home: iconHome,
+  user: iconUser,
+  previlige: iconPrevilige,
+  devices: iconDevice,
+  school: iconSchool,
+  actions: iconAction,
+  menus: iconMenu,
+  policies: iconPolicy,
+  WeeklyReport: iconWeeklyReport,
+  ReminderSettings: iconReminder,
+  upload: iconBulkUpload,
+  status: iconHistory,
+};
 
 function Sidebar() {
-  const [getSession, setSession] = useSession();
+  const [getSession] = useSession();
   const [nav, setNav] = useState([]);
+  const location = useLocation();
 
   useEffect(() => {
-    let arr = [];
     const sessionData = getSession();
-    // console.log(sessionData);
+    if (!sessionData) return;
 
-    sessionData?.data.map((item) => {
-      let i = arr.find((i) => i.MenuName === item.MenuName);
+    // Use a Set to track unique MenuNames for deduplication
+    const seen = new Set();
+    const arr = [];
 
-      if (i === undefined) {
-        let o = { Link: item.Link, MenuName: item.MenuName, Icon: item.Icon };
-        arr.push(o);
+    sessionData.data?.forEach((item) => {
+      if (!seen.has(item.MenuName)) {
+        arr.push({ Link: item.Link, MenuName: item.MenuName, Icon: item.Icon });
+        seen.add(item.MenuName);
       }
     });
 
-    if (sessionData?.isAdmin && !sessionData?.isAppDeveloper) {
-      arr.push({ Link: "/weekly-report", MenuName: "Weekly Report", Icon: "WeeklyReport" });
+    if (sessionData.isAdmin && !sessionData.isAppDeveloper) {
+      arr.push(
+        { Link: "/weekly-report", MenuName: "Weekly Report", Icon: "WeeklyReport" },
+        { Link: "/reminder-settings", MenuName: "Reminder Settings", Icon: "ReminderSettings" }
+      );
     }
-    
+
     setNav(arr);
   }, []);
 
+  // Helper to check if a nav item is active
+  const isActive = (link) => {
+    // Exact match or startsWith for subroutes
+    return location.pathname === link || location.pathname.startsWith(link + "/");
+  };
+
   return (
     <>
-      {/* < !-- ======= Sidebar ======= --> */}
+      {/* <!-- ======= Sidebar ======= --> */}
       <aside id="sidebar" className="sidebar">
         <ul className="sidebar-nav" id="sidebar-nav">
-          {nav.map((item) => {
-            return (
-              <li className="nav-item" key={item.MenuName}>
-                <Link to={item.Link} className="nav-link collapsed">
-                  <i className="bi bi-menu-button-wide">
-                    <img
-                      src={
-                        item.Icon === "user"
-                          ? iconUser
-                          : item.Icon === "previlige"
-                          ? iconPrevilige
-                          : item.Icon === "devices"
-                          ? iconDevice
-                          : item.Icon === "school"
-                          ? iconSchool
-                          : item.Icon === "actions"
-                          ? iconAction
-                          : item.Icon === "menus"
-                          ? iconMenu
-                          : item.Icon === "policies"
-                          ? iconPolicy
-                          : item.Icon === "home"
-                          ? iconHome
-                          : item.Icon === "WeeklyReport"
-                          ? iconWeeklyReport
-                          : item.Icon === "upload"
-                          ? iconBulkUpload
-                          : item.Icon === "status"
-                          ? iconHistory
-                          : ""
-                      }
-                      height="30"
-                    />
-                  </i>
-                  <span>{item.MenuName}</span>
-                </Link>
-              </li>
-            );
-          })}
+          {nav.map((item) => (
+            <li
+              className={`nav-item${isActive(item.Link) ? " active-tab" : ""}`}
+              key={item.MenuName}
+              style={isActive(item.Link) ? { backgroundColor: "#e9ecef" } : {}}
+            >
+              <Link to={item.Link} className={`nav-link collapsed${isActive(item.Link) ? " active" : ""}`}>
+                <i className="bi bi-menu-button-wide">
+                  <img
+                    src={iconMap[item.Icon] || ""}
+                    height="30"
+                    alt={item.MenuName + " icon"}
+                  />
+                </i>
+                <span>{item.MenuName}</span>
+              </Link>
+            </li>
+          ))}
         </ul>
       </aside>
-      {/* <!--End Sidebar-- > */}
+      {/* <!--End Sidebar--> */}
+      <style>
+        {`
+          .sidebar-nav .nav-item.active-tab,
+          .sidebar-nav .nav-link.active {
+            background-color: #e9ecef !important;
+            /* You can adjust the color as needed */
+          }
+        `}
+      </style>
     </>
   );
 }

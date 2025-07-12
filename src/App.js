@@ -15,6 +15,7 @@ import Previliges from './Components/Previliges';
 import Schools from './Components/Schools'
 import Users from './Components/Users';
 import WeeklyReport from './Components/WeeklyReport';
+import ReminderSettings from './Components/ReminderSettings';
 import './style.css';
 import {  Routes } from "react-router-dom";
 import { BrowserRouter, Route, } from 'react-router-dom';
@@ -44,6 +45,7 @@ function AppWrapper() {
           <Route path='/managepolicies' element={<Policy />} />
           <Route path='/uploadbulkdevices' element={<DevicesBulk />} />
           <Route path='/weekly-report' element={<WeeklyReport />} />
+          <Route path='/reminder-settings' element={<ReminderSettings />} />
           
         </Routes>
       </BrowserRouter>
