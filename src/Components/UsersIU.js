@@ -17,21 +17,20 @@ function UsersIU(props) {
     const [isVisible, setVisible] = useState(false)
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
+    const [selectedSchoolId, setSelectedSchoolId] = useState(-1)
 
     const validationSchema = Yup.object().shape({
         FirstName: Yup.string().required('First Name is required'),
         LastName: Yup.string().required('Last Name is required'),
-
         Username: Yup.string().required('User name is required').matches(new RegExp('^\'?\\p{L}+(?:[0-9])*[\' ]?$', 'gmu'), 'Special charactes are not allowed!'),
         Password: Yup.string().required('Password is required'),
         EmailID: Yup.string().required('Email is required').email("Email is invalid"),
-
         SchoolID: Yup.number().min(1, 'School is required'),
         PreviligeID: Yup.number().min(1, 'Previlige is required'),
     });
 
     const formik = useFormik({
-        enableReinitialize: true,  // This ensures the form will reinitialize when the userData changes
+        enableReinitialize: true,
         validationSchema,
         validateOnChange: true,
         validateOnBlur: false,
@@ -80,8 +79,18 @@ function UsersIU(props) {
     useEffect(() => {
         if (props?.editRow?.UserID > -1) {
             showModal()
-        } 
-    }, [props,formik])
+            setSelectedSchoolId(props?.editRow?.FKSchoolID || -1)
+        }
+    }, [props, formik])
+
+    // Handle school selection change
+    useEffect(() => {
+        // Reset PreviligeID when school changes
+        if (selectedSchoolId !== formik.values.SchoolID) {
+            setSelectedSchoolId(formik.values.SchoolID)
+            formik.setFieldValue('PreviligeID', -1)
+        }
+    }, [formik.values.SchoolID])
 
     const showModal = () => {
         setVisible(true)
@@ -92,8 +101,14 @@ function UsersIU(props) {
         formik.resetForm()
         setMessage('')
         setVisible(false)
+        setSelectedSchoolId(-1)
         props.handleModalClosed(msg, alertType, true);
     };
+
+    const handleSchoolChange = (value) => {
+        formik.setFieldValue('SchoolID', value.value)
+        formik.setFieldValue('PreviligeID', -1) // Reset role when school changes
+    }
 
     return (
         <>
@@ -118,13 +133,32 @@ function UsersIU(props) {
                                         keyField='SchoolID'
                                         valueField='SchoolName'
                                         selectedValue={formik.values.SchoolID}
-                                        onChange={value => formik.setFieldValue('SchoolID', value.value)}
+                                        onChange={handleSchoolChange}
                                     />
                                     <div className="text-danger">
                                         {formik.errors.SchoolID ? formik.errors.SchoolID : null}
                                     </div>
                                 </div>
                             }
+                            
+                            <div className="form-group">
+                                <label htmlFor="PreviligeID">Role Name</label>
+                                <Dropdown name="PreviligeID"
+                                    api={formik.values.SchoolID > 0 ? `previlige/${formik.values.SchoolID}` : null}
+                                    keyField='PreviligeID'
+                                    valueField='PreviligeName'
+                                    selectedValue={formik.values.PreviligeID}
+                                    onChange={value => formik.setFieldValue('PreviligeID', value.value)}
+                                    disabled={formik.values.SchoolID <= 0}
+                                />
+                                <div className="text-danger">
+                                    {formik.errors.PreviligeID ? formik.errors.PreviligeID : null}
+                                </div>
+                                {formik.values.SchoolID <= 0 && (
+                                    <small className="text-muted">Please select a school first to see available roles</small>
+                                )}
+                            </div>
+
                             <div className="form-group">
                                 <label htmlFor="FirstName">First Name</label>
                                 <input
@@ -152,7 +186,6 @@ function UsersIU(props) {
                                     {formik.errors.LastName ? formik.errors.LastName : null}
                                 </div>
                             </div>
-
 
                             <div className="form-group">
                                 <label htmlFor="Username">User Name</label>
@@ -207,20 +240,6 @@ function UsersIU(props) {
                                 />
                                 <div className="text-danger">
                                     {formik.errors.NfcID ? formik.errors.NfcID : null}
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label htmlFor="PreviligeID">Role Name</label>
-                                <Dropdown name="PreviligeID"
-                                    api={getSession()?.isAppDeveloper === true ? 'previlige' : `previlige/${getSession()?.schoolID}`}
-                                    keyField='PreviligeID'
-                                    valueField='PreviligeName'
-                                    selectedValue={formik.values.PreviligeID  }
-                                    onChange={value => formik.setFieldValue('PreviligeID', value.value)}
-                                />
-                                <div className="text-danger">
-                                    {formik.errors.PreviligeID ? formik.errors.PreviligeID : null}
                                 </div>
                             </div>
 

@@ -34,6 +34,7 @@ const iconMap = {
 function Sidebar() {
   const [getSession] = useSession();
   const [nav, setNav] = useState([]);
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -51,11 +52,16 @@ function Sidebar() {
       }
     });
 
-    if (sessionData.isAdmin && !sessionData.isAppDeveloper) {
-      arr.push(
-        { Link: "/weekly-report", MenuName: "Weekly Report", Icon: "WeeklyReport" },
-        { Link: "/reminder-settings", MenuName: "Reminder Settings", Icon: "ReminderSettings" }
-      );
+    // Move "Home" to the top if it exists
+    const homeIndex = arr.findIndex(
+      (item) =>
+        item.MenuName.toLowerCase() === "home" ||
+        item.Link === "/" ||
+        item.Icon === "home"
+    );
+    if (homeIndex > 0) {
+      const [homeItem] = arr.splice(homeIndex, 1);
+      arr.unshift(homeItem);
     }
 
     setNav(arr);
@@ -67,38 +73,216 @@ function Sidebar() {
     return location.pathname === link || location.pathname.startsWith(link + "/");
   };
 
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (window.innerWidth <= 768) {  // Only for mobile
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && !sidebar.contains(event.target)) {
+          setMobileMenuOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <>
-      {/* <!-- ======= Sidebar ======= --> */}
-      <aside id="sidebar" className="sidebar">
-        <ul className="sidebar-nav" id="sidebar-nav">
-          {nav.map((item) => (
+      {/* Mobile Menu Toggle */}
+      <button
+        className="mobile-nav-toggle"
+        onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+        style={{
+          position: 'fixed',
+          left: '10px',
+          top: '70px',
+          zIndex: 1000,
+          padding: '8px',
+          background: '#fff',
+          border: 'none',
+          borderRadius: '4px',
+          boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+          display: 'none',  // Hidden by default, shown in mobile media query
+          cursor: 'pointer'
+        }}
+      >
+        <img
+          src={iconMenu}
+          alt="Toggle Menu"
+          style={{ width: '24px', height: '24px' }}
+        />
+      </button>
+
+      {/* Sidebar */}
+      <aside 
+        id="sidebar" 
+        className={`sidebar${isMobileMenuOpen ? ' mobile-nav-active' : ''}`}
+        style={{ boxShadow: "2px 0 12px rgba(0,0,0,0.07)" }}
+      >
+        <ul className="sidebar-nav" id="sidebar-nav" style={{ padding: 0, margin: 0 }}>
+          {nav.map((item, idx) => (
             <li
-              className={`nav-item${isActive(item.Link) ? " active-tab" : ""}`}
+              className={`nav-item${isActive(item.Link) ? " active-tab" : ""}${idx === 0 ? " nav-item-home" : ""}`}
               key={item.MenuName}
-              style={isActive(item.Link) ? { backgroundColor: "#e9ecef" } : {}}
+              style={{
+                borderRadius: idx === 0 ? "12px 12px 0 0" : "0",
+                marginBottom: idx === 0 ? "10px" : "0",
+                boxShadow: idx === 0 ? "0 2px 8px rgba(255, 200, 100, 0.08)" : "",
+                transition: "background 0.2s, box-shadow 0.2s"
+              }}
             >
-              <Link to={item.Link} className={`nav-link collapsed${isActive(item.Link) ? " active" : ""}`}>
-                <i className="bi bi-menu-button-wide">
+              <Link
+                to={item.Link}
+                className={`nav-link collapsed${isActive(item.Link) ? " active" : ""}`}
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "12px 20px",
+                  fontWeight: idx === 0 ? "600" : "500",
+                  color: idx === 0 ? "#c20001" : "#333",
+                  fontSize: idx === 0 ? "1.15rem" : "1rem",
+                  letterSpacing: idx === 0 ? "0.5px" : "0",
+                  borderLeft: isActive(item.Link) ? "4px solid #c20001" : "4px solid transparent",
+                  background: isActive(item.Link) ? "#e9ecef" : "transparent",
+                  borderRadius: idx === 0 ? "10px" : "0",
+                  transition: "all 0.2s"
+                }}
+              >
+                <i className="bi bi-menu-button-wide" style={{ marginRight: 12, display: "flex", alignItems: "center" }}>
                   <img
                     src={iconMap[item.Icon] || ""}
-                    height="30"
+                    height={idx === 0 ? "34" : "28"}
+                    style={{
+                      width: idx === 0 ? 34 : 28,
+                      height: idx === 0 ? 34 : 28,
+                      filter: idx === 0 ? "drop-shadow(0 2px 6px #ffe0e0)" : "none",
+                      borderRadius: idx === 0 ? 8 : 0,
+                      background: idx === 0 ? "none" : "none",
+                      padding: idx === 0 ? 2 : 0,
+                      transition: "all 0.2s"
+                    }}
                     alt={item.MenuName + " icon"}
                   />
                 </i>
-                <span>{item.MenuName}</span>
+                <span style={{ flex: 1 }}>{item.MenuName}</span>
               </Link>
             </li>
           ))}
         </ul>
       </aside>
-      {/* <!--End Sidebar--> */}
+
+      {/* Mobile overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="mobile-nav-overlay"
+          onClick={() => setMobileMenuOpen(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.5)',
+            zIndex: 998,
+            display: 'none'  // Hidden by default, shown in mobile media query
+          }}
+        />
+      )}
+
       <style>
         {`
+          .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            height: calc(100vh - 60px);
+            width: 240px;
+            background: #fff;
+            z-index: 999;
+            transition: all 0.3s ease;
+          }
+
+          /* Desktop and Tablet */
+          @media (min-width: 769px) {
+            #main {
+              margin-left: 240px;
+            }
+            
+            .sidebar {
+              transform: translateX(0);
+            }
+          }
+
+          /* Small screens and tablets */
+          @media (max-width: 1024px) {
+            .sidebar {
+              width: 200px;
+            }
+            #main {
+              margin-left: 200px;
+            }
+          }
+
+          /* Mobile */
+          @media (max-width: 768px) {
+            .mobile-nav-toggle {
+              display: block !important;
+            }
+
+            .mobile-nav-overlay {
+              display: block !important;
+            }
+
+            .sidebar {
+              transform: translateX(-100%);
+              width: 240px;
+            }
+
+            .sidebar.mobile-nav-active {
+              transform: translateX(0);
+            }
+
+            #main {
+              margin-left: 0;
+            }
+          }
+
           .sidebar-nav .nav-item.active-tab,
           .sidebar-nav .nav-link.active {
             background-color: #e9ecef !important;
-            /* You can adjust the color as needed */
+          }
+          .sidebar-nav .nav-item-home {
+            box-shadow: 0 2px 8px rgba(255, 200, 100, 0.08);
+            border-radius: 12px 12px 0 0;
+            margin-bottom: 10px;
+          }
+          .sidebar-nav .nav-item-home .nav-link {
+            color: #c20001 !important;
+            font-weight: 600 !important;
+            font-size: 1.15rem !important;
+            letter-spacing: 0.5px;
+            background: transparent !important;
+            border-radius: 10px !important;
+          }
+          .sidebar-nav .nav-item-home .nav-link img {
+            filter: drop-shadow(0 2px 6px #ffe0e0);
+            background: none;
+            border-radius: 8px;
+            padding: 2px;
+          }
+          .sidebar-nav .nav-link {
+            transition: background 0.2s, color 0.2s;
+          }
+          .sidebar-nav .nav-link:hover {
+            background: #f7f7f7 !important;
+            color: #c20001 !important;
+            text-decoration: none;
+          }
+          .sidebar-nav .nav-link:hover img {
+            filter: drop-shadow(0 2px 6px #ffe0e0) brightness(1.1);
           }
         `}
       </style>

@@ -59,7 +59,7 @@ function MenusIU(props) {
         if (props.editRow?.MenuID > -1) {
             showModal()
         }
-    }, [props,])
+    }, [props])
 
     const showModal = () => {
         setVisible(true)
