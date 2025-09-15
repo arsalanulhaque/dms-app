@@ -6,13 +6,13 @@ import $ from "jquery";
 function Dropdown(props) {
     const [data, setData] = useState([])
 
-    const formatOptionLabel = ({ value, label, labelSchool }) => (
-        <div style={{ display: "flex" }}>
-            <div>{label}</div>
+    const formatOptionLabel = ({ label, labelSchool }) => (
+        <div style={{ display: "flex", alignItems: "center" }}>
+            <span>{label}</span>
             {labelSchool && (
-                <div style={{ marginLeft: "10px", color: "#ccc" }}>
+                <span style={{ marginLeft: 12, color: "#888", fontSize: "0.95em" }} aria-label="School Name">
                     {labelSchool}
-                </div>
+                </span>
             )}
         </div>
     );
