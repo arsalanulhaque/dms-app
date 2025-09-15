@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
 import Modal from "react-bootstrap/Modal";
 import ModalHeader from "react-bootstrap/ModalHeader";
@@ -14,7 +14,7 @@ import useSession from '../Context/SessionContext'
 import MenuActionMatrix from './Controls/MenuActionMatrix'
 
 function PolicyIU(props) {
-    const [getSession, setSession] = useSession()
+    const [getSession] = useSession()
     const [isVisible, setVisible] = useState(false)
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -39,41 +39,39 @@ function PolicyIU(props) {
             // Clear any previous messages
             setMessage('');
             
-            // Custom validation for selected policies
-            if (selectedPolicies.length === 0) {
+            // Simple validation
+            if (!selectedPolicies || selectedPolicies.length === 0) {
                 setAlertType('danger');
                 setMessage('At least one action must be selected');
                 return;
             }
 
-            let endpoint, httpMethod, body;
+            // ALWAYS use PUT method to prevent duplicates
+            // This will replace all policies for the role with the selected ones
+            const endpoint = 'policy/batch';
+            const httpMethod = 'put';
+            const body = {
+                PreviligeID: data.PreviligeID,
+                policies: selectedPolicies
+            };
 
-            if (isEditMode) {
-                // Update mode - replace all existing policies for this role
-                endpoint = 'policy/batch'
-                httpMethod = 'put'
-                body = {
-                    PreviligeID: data.PreviligeID,
-                    policies: selectedPolicies
-                }
-            } else {
-                // Create mode - batch create new policies
-                endpoint = 'policy/batch'
-                httpMethod = 'post'
-                body = { policies: selectedPolicies }
-            }
+            console.log('Submitting policies:', body);
 
             FetchData(endpoint, httpMethod, body, (result) => {
                 if (!result.data.error) {
                     hideModal(result?.data?.error === true ? 'danger' : 'success', result?.data?.message)
-                }
-                else {
+                } else {
                     setAlertType('danger')
                     setMessage(result.data.message)
                 }
-            })
+            });
         },
     });
+
+    const showModal = useCallback(() => {
+        setVisible(true)
+        props.handleModalOpen(true);
+    }, [props]);
 
     // Load existing policies when editing
     useEffect(() => {
@@ -83,19 +81,19 @@ function PolicyIU(props) {
             loadExistingPolicies(props.editRow.FKPreviligeID);
             showModal();
         }
-    }, [props.editRow]);
+    }, [props.editRow, showModal]);
 
     // Load existing policies for edit mode
     const loadExistingPolicies = (previligeId) => {
-        // Get all existing policies for this role across all menus
+        console.log('PolicyIU: Loading existing policies for role:', previligeId);
         FetchData(`policy`, 'get', null, (response) => {
             try {
                 const responseData = response?.data || response;
                 if (responseData && Array.isArray(responseData.data)) {
-                    // Filter policies for the current role
                     const rolePolicies = responseData.data.filter(policy => 
                         policy.FKPreviligeID === previligeId
                     );
+                    console.log('PolicyIU: Found', rolePolicies.length, 'policies for role', previligeId);
                     setExistingPolicies(rolePolicies);
                 }
             } catch (error) {
@@ -104,20 +102,17 @@ function PolicyIU(props) {
         });
     };
 
-    // Handle policy selection change from matrix
+    // Handle policy selection change from matrix - SIMPLIFIED
     const handlePolicySelectionChange = (policies) => {
-        setSelectedPolicies(policies);
-        formik.setFieldValue('selectedPolicies', policies);
+        console.log('PolicyIU: Received policies:', policies?.length || 0);
+        
+        setSelectedPolicies(policies || []);
+        formik.setFieldValue('selectedPolicies', policies || []);
         
         // Clear any previous error messages
-        if (policies.length > 0) {
+        if (policies && policies.length > 0) {
             setMessage('');
         }
-    };
-
-    const showModal = () => {
-        setVisible(true)
-        props.handleModalOpen(true);
     };
 
     const hideModal = (alertType, msg) => {
@@ -190,9 +185,9 @@ function PolicyIU(props) {
                         <button 
                             type="submit" 
                             className="btn btn-primary"
-                            disabled={selectedPolicies.length === 0}
+                            disabled={!selectedPolicies || selectedPolicies.length === 0}
                         >
-                            {isEditMode ? 'Update Policies' : 'Create Policies'}
+                            {isEditMode ? 'Update Policies' : 'Save Policies'}
                         </button>
                     </ModalFooter>
                 </form>

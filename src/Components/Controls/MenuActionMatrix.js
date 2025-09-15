@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import FetchData from '../../Hooks/FetchData';
 
 function MenuActionMatrix(props) {
+    const { roleId, onChange } = props;
     const [menus, setMenus] = useState([]);
     const [menuActions, setMenuActions] = useState({});
     const [selectedPolicies, setSelectedPolicies] = useState({});
@@ -36,6 +37,73 @@ function MenuActionMatrix(props) {
     };
 
 
+    // Load existing policies for edit mode - SIMPLE VERSION
+    const loadExistingPolicies = (existingPolicies) => {
+        console.log('Processing existing policies:', existingPolicies?.length || 0, 'policies');
+        const policiesMap = {};
+        
+        if (!existingPolicies || existingPolicies.length === 0) {
+            setSelectedPolicies({});
+            return;
+        }
+        
+        existingPolicies.forEach((policy) => {
+            // Handle both possible field naming conventions
+            const menuId = policy.FKPreviligeMenuID || policy.PreviligeMenuID;
+            const actionId = policy.FKPreviligeActionID || policy.PreviligeActionID;
+            
+            if (menuId && actionId) {
+                const key = `${menuId}-${actionId}`;
+                policiesMap[key] = true;
+            }
+        });
+        
+        console.log('Pre-checking', Object.keys(policiesMap).length, 'policies');
+        setSelectedPolicies(policiesMap);
+        
+        // Notify parent - ONLY ONCE
+        if (onChange) {
+            const currentPolicies = Object.keys(policiesMap).map(key => {
+                const [menuId, actionId] = key.split('-').map(Number);
+                return {
+                    PreviligeID: roleId,
+                    PreviligeMenuID: menuId,
+                    PreviligeActionID: actionId
+                };
+            });
+            onChange(currentPolicies);
+        }
+    };
+
+    // Load existing policies for a specific role - SIMPLE VERSION
+    const loadExistingPoliciesForRole = (targetRoleId) => {
+        console.log('Fetching policies for role:', targetRoleId);
+        
+        FetchData('policy', 'get', null, (response) => {
+            try {
+                const responseData = response?.data || response;
+                let rolePolicies = [];
+                
+                if (responseData && Array.isArray(responseData.data)) {
+                    rolePolicies = responseData.data.filter(policy => 
+                        policy.FKPreviligeID === targetRoleId
+                    );
+                } else if (responseData && Array.isArray(responseData)) {
+                    rolePolicies = responseData.filter(policy => 
+                        policy.FKPreviligeID === targetRoleId
+                    );
+                }
+                
+                console.log('Found', rolePolicies.length, 'existing policies for role', targetRoleId);
+                loadExistingPolicies(rolePolicies);
+                
+            } catch (error) {
+                console.error('Error loading existing policies for role:', error);
+                setSelectedPolicies({});
+            }
+        });
+    };
+
     // Load menus and their actions
     useEffect(() => {
         if (!props.roleId || props.roleId <= 0) {
@@ -47,6 +115,8 @@ function MenuActionMatrix(props) {
         }
 
         setLoading(true);
+        // Reset selected policies when role changes
+        setSelectedPolicies({});
         
         // Get all menus - use the general endpoint to get all available menus
         const menuApi = 'menus';
@@ -177,14 +247,6 @@ function MenuActionMatrix(props) {
                         };
                     });
                     setMenuActions(actionsMap);
-                    
-                    // Load existing policies - always check for existing policies for the role
-                    if (props.roleId && props.roleId > 0) {
-                        loadExistingPoliciesForRole(props.roleId);
-                    } else if (props.existingPolicies && props.existingPolicies.length > 0) {
-                        loadExistingPolicies(props.existingPolicies);
-                    }
-                    
                     setLoading(false);
                 });
 
@@ -194,52 +256,28 @@ function MenuActionMatrix(props) {
                 setLoading(false);
             }
         });
-    }, [props.roleId, props.schoolId, props.previligeId, props.isAppDeveloper, props.existingPolicies]);
+    }, [props.roleId, props.schoolId, props.previligeId, props.isAppDeveloper]);
 
-    // Load existing policies for a specific role
-    const loadExistingPoliciesForRole = (roleId) => {
-        FetchData('policy', 'get', null, (response) => {
-            try {
-                const responseData = response?.data || response;
-                if (responseData && Array.isArray(responseData.data)) {
-                    // Filter policies for the current role
-                    const rolePolicies = responseData.data.filter(policy => 
-                        policy.FKPreviligeID === roleId
-                    );
-                    console.log(`Found ${rolePolicies.length} existing policies for role ${roleId}:`, rolePolicies);
-                    loadExistingPolicies(rolePolicies);
-                }
-            } catch (error) {
-                console.error('Error loading existing policies for role:', error);
-            }
-        });
-    };
-
-    // Load existing policies for edit mode
-    const loadExistingPolicies = (existingPolicies) => {
-        const policiesMap = {};
-        existingPolicies.forEach(policy => {
-            const key = `${policy.FKPreviligeMenuID || policy.PreviligeMenuID}-${policy.FKPreviligeActionID || policy.PreviligeActionID}`;
-            policiesMap[key] = true;
-        });
-        console.log('Pre-checking policies:', policiesMap);
-        setSelectedPolicies(policiesMap);
-        
-        // Also notify parent component about existing policies
-        if (props.onChange && Object.keys(policiesMap).length > 0) {
-            const policies = Object.keys(policiesMap).map(key => {
-                const [menuId, actionId] = key.split('-').map(Number);
-                return {
-                    PreviligeID: props.roleId,
-                    PreviligeMenuID: menuId,
-                    PreviligeActionID: actionId
-                };
-            });
-            props.onChange(policies);
+    // SIMPLE useEffect for loading existing policies - NO DEPENDENCIES TO AVOID LOOPS
+    useEffect(() => {
+        if (!props.roleId || props.roleId <= 0) {
+            setSelectedPolicies({});
+            return;
         }
-    };
 
-    // Handle checkbox change
+        console.log('Loading existing policies for role:', props.roleId);
+        
+        // Load policies - prioritize props
+        if (props.existingPolicies && props.existingPolicies.length > 0) {
+            console.log('Using existing policies from props');
+            loadExistingPolicies(props.existingPolicies);
+        } else {
+            console.log('Fetching from API');
+            loadExistingPoliciesForRole(props.roleId);
+        }
+    }, [props.roleId]); // ONLY roleId dependency
+
+    // Handle checkbox change - ULTRA SIMPLE
     const handleActionChange = (menuId, actionId, isChecked) => {
         const key = `${menuId}-${actionId}`;
         const newSelectedPolicies = { ...selectedPolicies };
@@ -250,23 +288,24 @@ function MenuActionMatrix(props) {
             delete newSelectedPolicies[key];
         }
         
+        // Update state immediately
         setSelectedPolicies(newSelectedPolicies);
         
-        // Notify parent component
-        if (props.onChange) {
+        // Notify parent with simple array
+        if (onChange) {
             const policies = Object.keys(newSelectedPolicies).map(key => {
                 const [menuId, actionId] = key.split('-').map(Number);
                 return {
-                    PreviligeID: props.roleId,
+                    PreviligeID: roleId,
                     PreviligeMenuID: menuId,
                     PreviligeActionID: actionId
                 };
             });
-            props.onChange(policies);
+            onChange(policies);
         }
     };
 
-    // Handle select all for a menu
+    // Handle select all for a menu - ULTRA SIMPLE
     const handleMenuSelectAll = (menuId, selectAll) => {
         const menuActionsData = menuActions[menuId];
         if (!menuActionsData) return;
@@ -284,17 +323,17 @@ function MenuActionMatrix(props) {
         
         setSelectedPolicies(newSelectedPolicies);
         
-        // Notify parent component
-        if (props.onChange) {
+        // Notify parent
+        if (onChange) {
             const policies = Object.keys(newSelectedPolicies).map(key => {
                 const [menuId, actionId] = key.split('-').map(Number);
                 return {
-                    PreviligeID: props.roleId,
+                    PreviligeID: roleId,
                     PreviligeMenuID: menuId,
                     PreviligeActionID: actionId
                 };
             });
-            props.onChange(policies);
+            onChange(policies);
         }
     };
 
