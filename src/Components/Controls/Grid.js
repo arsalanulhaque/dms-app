@@ -251,6 +251,30 @@ const Grid = (props) => {
 
     FetchData(props.api, 'get', null, (result) => {
       if (result.error === false) {
+        // Special handling for policy data - group actions by menu and role
+        if (window.location.pathname === '/managepolicies') {
+          // Group policies by role and menu, combining actions
+          const groupedPolicies = {};
+          
+          result.data.forEach(policy => {
+            const key = `${policy.FKPreviligeID}_${policy.FKPreviligeMenuID}`;
+            
+            if (!groupedPolicies[key]) {
+              groupedPolicies[key] = {
+                ...policy,
+                id: policy.PreviligeMenuActionsID,
+                ActionName: policy.ActionName
+              };
+            } else {
+              // Combine action names with comma separation
+              groupedPolicies[key].ActionName += ', ' + policy.ActionName;
+            }
+          });
+          
+          // Convert grouped object back to array
+          result.data = Object.values(groupedPolicies);
+        }
+
         result.data.forEach(obj => {
           obj.id = obj?.DeviceID || obj?.DeviceStatusID || obj?.PreviligeID || obj?.SchoolID || obj?.UserID || obj?.PreviligeSchoolID || obj?.ActionID || obj?.MenuID || obj.PreviligeMenuActionsID;
         });
@@ -281,7 +305,7 @@ const Grid = (props) => {
               'ID': { width: 70 },
               'School Name': { minWidth: 200 },
               'URL': { minWidth: 250 },
-              'Action Name': { minWidth: 150 },
+              'Action Name': { minWidth: window.location.pathname === '/managepolicies' ? 250 : 150 },
               'User Name': { minWidth: 150 },
               'First Name': { minWidth: 150 },
               'Last Name': { minWidth: 150 },

@@ -173,8 +173,7 @@ function PolicyIU(props) {
 
                         {isEditMode && (
                             <div className="alert alert-info">
-                                <strong>Edit Mode:</strong> You are updating existing policies for this role. 
-                                Changes will replace all current policy settings for this role.
+                                <strong>Edit Mode:</strong> You are updating existing policies for this role.
                             </div>
                         )}
                     </ModalBody>
