@@ -22,7 +22,7 @@ function Search() {
     const [getSession] = useSession();
     const [alertType, setAlertType] = useState('');
     const [message, setMessage] = useState('');
-    const [isLoader, setLoader] = useState(false);
+    const [isLoader] = useState(false);
     const [lstIssuedDevices, setIssuedDevices] = useState([]);
     const [lstAvailableDevices, setAvailableDevices] = useState([]);
     const [lstUnavailableDevices, setUnavailableDevices] = useState([]);

@@ -7,7 +7,7 @@ import Alert from 'react-bootstrap/Alert';
 import useSession from '../Context/SessionContext'
 
 function Devices() {
-    const [getSession, setSession] = useSession()
+    const [getSession] = useSession()
     const [editRow, setEditRow] = useState({})
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')

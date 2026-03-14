@@ -1,5 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Modal from "react-bootstrap/Modal";
 import ModalHeader from "react-bootstrap/ModalHeader";
 import ModalTitle from "react-bootstrap/ModalTitle";
@@ -14,7 +14,7 @@ import useSession from '../Context/SessionContext'
 
 
 function PreviligesIU(props) {
-    const [getSession, setSession] = useSession()
+    const [getSession] = useSession()
     const [isVisible, setVisible] = useState(false)
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -27,22 +27,27 @@ function PreviligesIU(props) {
     const formik = useFormik({
         enableReinitialize: true,  // This ensures the form will reinitialize when the userData changes
         validationSchema,
-        validateOnChange: true,
+        validateOnChange: false,
         validateOnBlur: false,
         initialValues: {
             PreviligeID: props?.editRow?.PreviligeID || -1,
-            SchoolID: props?.editRow?.FKSchoolID || -1,
+            // For School Admins, default to their school; super admins can choose via dropdown
+            SchoolID: props?.editRow?.FKSchoolID || getSession()?.schoolID || -1,
             PreviligeName: props?.editRow?.PreviligeName || "",
         },
 
         onSubmit: (data) => {
-            let httpMethod = props.editRow?.PreviligeID > 0 ? 'put' : 'post'
+            const isEdit = props.editRow?.PreviligeID > 0;
+            let httpMethod = isEdit ? 'put' : 'post'
             let endpoint = 'previlige'
             let body = {
                 "previlige": {
-                    "PreviligeID": props?.editRow?.PreviligeID > 0 ? props?.editRow?.PreviligeID : null,
+                    "PreviligeID": isEdit ? props?.editRow?.PreviligeID : null,
                     "PreviligeName": data.PreviligeName,
-                    "SchoolID": data.SchoolID,
+                    // Ensure School Admins always use their own school ID
+                    "SchoolID": getSession()?.isAppDeveloper === false
+                        ? getSession()?.schoolID
+                        : data.SchoolID,
                 }
             }
 
@@ -59,16 +64,10 @@ function PreviligesIU(props) {
 
     });
 
-    useEffect(() => {
-        if (props?.editRow?.PreviligeID > -1) {
-            showModal()
-        }
-    }, [props,])
-
-    const showModal = () => {
+    const showModal = useCallback(() => {
         setVisible(true)
         props.handleModalOpen(true);
-    };
+    }, [props]);
 
     const hideModal = (alertType, msg) => {
         formik.resetForm()
@@ -76,6 +75,12 @@ function PreviligesIU(props) {
         setVisible(false)
         props.handleModalClosed(msg, alertType, true);
     };
+
+    useEffect(() => {
+        if (props?.editRow?.PreviligeID > -1) {
+            showModal()
+        }
+    }, [props?.editRow?.PreviligeID, showModal])
 
     return (
         <>
@@ -102,9 +107,11 @@ function PreviligesIU(props) {
                                         selectedValue={formik.values.SchoolID}
                                         onChange={value => formik.setFieldValue('SchoolID', value.value)}
                                     />
-                                    <div className="text-danger">
-                                        {formik.errors.SchoolID ? formik.errors.SchoolID : null}
-                                    </div>
+                                    {formik.submitCount > 0 && formik.errors.SchoolID && (
+                                        <div className="text-danger">
+                                            {formik.errors.SchoolID}
+                                        </div>
+                                    )}
                                 </div>
                             }
                             <div className="form-group">
@@ -116,9 +123,11 @@ function PreviligesIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.PreviligeName}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.PreviligeName ? formik.errors.PreviligeName : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.PreviligeName && (
+                                    <div className="text-danger">
+                                        {formik.errors.PreviligeName}
+                                    </div>
+                                )}
                             </div>
 
                         </div>

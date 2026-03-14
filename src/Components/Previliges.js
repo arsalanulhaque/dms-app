@@ -1,5 +1,5 @@
 
-import {  useEffect, useState } from 'react';
+import { useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Grid from './Controls/Grid';
@@ -8,7 +8,7 @@ import Alert from 'react-bootstrap/Alert';
 import useSession from '../Context/SessionContext'
 
 function Previliges() {
-   const [getSession, setSession] = useSession()
+   const [getSession] = useSession()
     const [editRow, setEditRow] = useState({})
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -39,10 +39,6 @@ function Previliges() {
         setAlertType(alertType)
         setReload(true)
     }
-    useEffect(() => {
-
-    }, [setEditRow])
-
     return (
         <>
             <Header />

@@ -1,5 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Alert from 'react-bootstrap/Alert';
@@ -9,7 +9,7 @@ import readXlsxFile from 'read-excel-file';
 import FetchData from '../Hooks/FetchData'
 
 function DevicesBulk() {
-    const [getSession, setSession] = useSession()
+    const [getSession] = useSession()
     const [data, setData] = useState(undefined)
 
     const [message, setMessage] = useState('')

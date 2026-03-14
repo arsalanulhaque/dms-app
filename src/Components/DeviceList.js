@@ -17,7 +17,7 @@ function DeviceList({ state, title, titleStyle, handleCheckout, handleCheckin, p
                         state === 'available' ?
                             <div className="col-1 mt-2 mr-1">
                                 <div className="fs-6 ">
-                                    <img src={iconBasket} className="icon-28 position-relative" />
+                                    <img src={iconBasket} alt="Basket icon" className="icon-28 position-relative" />
                                     <span className="position-absolute top-0  translate-middle badge rounded-pill bg-danger">{products.length}</span>
                                 </div>
                             </div>

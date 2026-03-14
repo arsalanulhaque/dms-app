@@ -9,7 +9,7 @@ import Alert from "react-bootstrap/Alert";
 import iconLogin from "../assets/img/login_icon.png";
 
 function AdminLogin() {
-  const [getSession, setSession] = useSession();
+  const [, setSession] = useSession();
   const navigate = useNavigate();
   const [alertType, setAlertType] = useState("");
   const [message, setMessage] = useState("");
@@ -22,6 +22,8 @@ function AdminLogin() {
   const formik = useFormik({
     enableReinitialize: true, // This ensures the form will reinitialize when the userData changes
     validationSchema,
+    validateOnChange: false,
+    validateOnBlur: false,
     initialValues: {
       Email: "",
       Password: "",
@@ -86,7 +88,7 @@ function AdminLogin() {
             <div className="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
               <div className="card mb-3">
                 <div className="card-header bg-light d-flex flex-row align-items-center">
-                  <img src={iconLogin} className="icon-48" />
+                  <img src={iconLogin} alt="Admin login icon" className="icon-48" />
                   <h1 className="">Login</h1>
                 </div>
                 <div className="card-body">
@@ -104,7 +106,9 @@ function AdminLogin() {
                           onChange={formik.handleChange}
                           value={formik.values.Email}
                         />
-                        <p className="text-danger">{formik.errors.Email}</p>
+                        {formik.submitCount > 0 && formik.errors.Email && (
+                          <p className="text-danger">{formik.errors.Email}</p>
+                        )}
                       </div>
                     </div>
                     <div className="col-12">
@@ -119,7 +123,9 @@ function AdminLogin() {
                             value={formik.values.Password}
                           />
                         </div>
-                        <p className="text-danger">{formik.errors.Password}</p>
+                        {formik.submitCount > 0 && formik.errors.Password && (
+                          <p className="text-danger">{formik.errors.Password}</p>
+                        )}
                       </div>
                     </div>
                     <div className="col-12">

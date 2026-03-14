@@ -6,7 +6,7 @@ import useSession from '../Context/SessionContext'
 import React from 'react';
 
 function DeviceStatus() {
-    const [getSession, setSession] = useSession()
+    const [getSession] = useSession()
 
     return (
         <>

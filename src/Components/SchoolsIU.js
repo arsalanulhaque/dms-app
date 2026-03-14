@@ -24,7 +24,7 @@ function SchoolsIU(props) {
     const formik = useFormik({
         enableReinitialize: true,  // This ensures the form will reinitialize when the userData changes
         validationSchema,
-        validateOnChange: true,
+        validateOnChange: false,
         validateOnBlur: false,
         initialValues: {
             SchoolID: props?.editRow?.SchoolID || -1,
@@ -58,12 +58,6 @@ function SchoolsIU(props) {
 
     });
 
-    useEffect(() => {
-        if (props?.editRow?.SchoolID > -1) {
-            showModal()
-        } 
-    }, [props, ])
-
     const showModal = () => {
         setVisible(true)
         props.handleModalOpen(true);
@@ -75,6 +69,12 @@ function SchoolsIU(props) {
         setVisible(false)
         props.handleModalClosed(msg, alertType, true);
     };
+
+    useEffect(() => {
+        if (props?.editRow?.SchoolID > -1) {
+            showModal()
+        } 
+    }, [props?.editRow?.SchoolID])
 
     return (
         <>
@@ -100,9 +100,11 @@ function SchoolsIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.SchoolName}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.SchoolName ? formik.errors.SchoolName : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.SchoolName && (
+                                    <div className="text-danger">
+                                        {formik.errors.SchoolName}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group">
@@ -114,9 +116,11 @@ function SchoolsIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.EmailID}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.EmailID ? formik.errors.EmailID : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.EmailID && (
+                                    <div className="text-danger">
+                                        {formik.errors.EmailID}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group">
@@ -128,9 +132,11 @@ function SchoolsIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.Address}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.Address ? formik.errors.Address : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.Address && (
+                                    <div className="text-danger">
+                                        {formik.errors.Address}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </ModalBody>

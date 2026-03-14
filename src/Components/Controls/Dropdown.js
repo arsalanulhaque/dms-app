@@ -1,7 +1,10 @@
-import { useEffect, useState, } from "react";
+import { useEffect, useState } from "react";
 import FetchData from '../../Hooks/FetchData'
 import Select from 'react-select'
 import $ from "jquery";
+
+// Simple in-memory cache to avoid refetching the same endpoint repeatedly
+const dropdownCache = {};
 
 function Dropdown(props) {
     const [data, setData] = useState([])
@@ -24,6 +27,12 @@ function Dropdown(props) {
 
         if (!props.api) {
             setData([{ value: -1, label: 'Select School First' }]);
+            return;
+        }
+
+        // If we already have cached options for this API, reuse them
+        if (dropdownCache[props.api]) {
+            setData(dropdownCache[props.api]);
             return;
         }
 
@@ -56,6 +65,7 @@ function Dropdown(props) {
                             })
                         }
                     });
+                    dropdownCache[props.api] = options;
                     setData(options);
                 } else {
                     console.error('Response data is not an array:', dataArray);

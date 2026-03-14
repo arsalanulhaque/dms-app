@@ -227,8 +227,9 @@ const Grid = (props) => {
   };
 
   useEffect(() => {
+    const session = getSession();
     setReload(props.reload);
-    getSession()?.data.forEach((item) => {
+    session?.data.forEach((item) => {
       if (item.Link === window.location.pathname) {
         switch (item.ActionName) {
           case 'Create':

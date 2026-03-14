@@ -22,7 +22,7 @@ function ActionsIU(props) {
     const formik = useFormik({
         enableReinitialize: true,  // This ensures the form will reinitialize when the userData changes
         validationSchema,
-        validateOnChange: true,
+        validateOnChange: false,
         validateOnBlur: false,
         initialValues: {
             ActionID: props?.editRow?.ActionID || -1,
@@ -50,12 +50,6 @@ function ActionsIU(props) {
         },
     });
 
-    useEffect(() => {
-        if (props?.editRow?.ActionID > -1) {
-            showModal()
-        }
-    }, [props,])
-
     const showModal = () => {
         setVisible(true)
         props.handleModalOpen(true);
@@ -67,6 +61,12 @@ function ActionsIU(props) {
         setVisible(false)
         props.handleModalClosed(msg, alertType, true);
     };
+
+    useEffect(() => {
+        if (props?.editRow?.ActionID > -1) {
+            showModal()
+        }
+    }, [props?.editRow?.ActionID])
 
     return (
         <>
@@ -92,9 +92,11 @@ function ActionsIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.ActionName}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.ActionName ? formik.errors.ActionName : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.ActionName && (
+                                    <div className="text-danger">
+                                        {formik.errors.ActionName}
+                                    </div>
+                                )}
                             </div>
 
                         </div>

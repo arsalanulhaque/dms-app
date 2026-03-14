@@ -18,6 +18,7 @@ function WeeklyReport() {
   const [message, setMessage] = useState("");
   const [alertType, setAlertType] = useState("");
   const [ccEmails, setCcEmails] = useState(Array(5).fill(""));
+  const [isLoading, setIsLoading] = useState(true);
 
   const adminEmail = getSession()?.emailID;
   const schoolEmail = getSession()?.supervisorEmailID;
@@ -40,26 +41,44 @@ function WeeklyReport() {
 
   // Fetch existing settings when component mounts
   useEffect(() => {
+    const session = getSession();
+
     const fetchSettings = () => {
-      FetchData(`weekly-email-settings/${getSession()?.schoolID}/${getSession()?.userID}`, "get", null, (result) => {
-        if (!result?.error && result?.data) {
-          const settings = result.data;
-          
-          // Set day
-          const dayOption = days.find(d => d.label === settings.DayOfWeek);
-          if (dayOption) {
-            setSelectedDay(dayOption);
+      FetchData(
+        `weekly-email-settings/${session?.schoolID}/${session?.userID}`,
+        "get",
+        null,
+        (result) => {
+          setIsLoading(false);
+
+          // Allow usage whether .data exists or not
+          const settings = result?.data || result;
+          if (!settings || settings.error) {
+            return;
           }
 
-          // Set time
-          const hour = String(settings.HourOfDay).padStart(2, '0');
-          const minute = String(settings.MinuteOfDay).padStart(2, '0');
-          setSelectedTime(`${hour}:${minute}`);
+          // Set day (if stored as label or value in backend, try both; fallback to "Select a day")
+          let dayOption =
+            days.find((d) => d.label === settings.DayOfWeek) ||
+            days.find((d) => d.value === settings.DayOfWeek) ||
+            days[0];
 
-          // Set email
+          setSelectedDay(dayOption);
+
+          // Set time if both hour and minute present
+          if (
+            typeof settings.HourOfDay !== "undefined" &&
+            typeof settings.MinuteOfDay !== "undefined"
+          ) {
+            const hour = String(settings.HourOfDay).padStart(2, "0");
+            const minute = String(settings.MinuteOfDay).padStart(2, "0");
+            setSelectedTime(`${hour}:${minute}`);
+          }
+
+          // Set selected email for "send to"
           setSelectedEmail(settings.SendToEmail || "");
 
-          // Set CC emails
+          // Set CC emails, ensure exactly 5 elements (empty strings for missing)
           const newCcEmails = [
             settings.CC1 || "",
             settings.CC2 || "",
@@ -69,13 +88,17 @@ function WeeklyReport() {
           ];
           setCcEmails(newCcEmails);
         }
-      });
+      );
     };
 
-    if (getSession()?.schoolID && getSession()?.userID) {
+    if (session?.schoolID && session?.userID) {
       fetchSettings();
+    } else {
+      setIsLoading(false);
     }
-  }, [getSession]);
+    // Run only once on mount; safe because we capture session values above
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const customStyles = {
     control: (base) => ({
@@ -129,8 +152,10 @@ function WeeklyReport() {
     };
 
     FetchData("weekly-email-settings", "post", scheduleData, (result) => {
-      if (result?.error) {
-        setMessage(result.message || "Failed to save schedule");
+      const response = result?.data || result;
+
+      if (response?.error) {
+        setMessage(response.message || "Failed to save schedule");
         setAlertType("danger");
       } else {
         setMessage("Schedule saved successfully");
@@ -169,6 +194,12 @@ function WeeklyReport() {
                   </Alert>
                 )}
                 <Card.Body className="pt-4">
+                  {isLoading ? (
+                    <div className="text-center py-5">
+                      <span className="spinner-border text-primary mb-2" role="status" />
+                      <div>Loading weekly report schedule...</div>
+                    </div>
+                  ) : (
                   <div className="row justify-content-center">
                     <div className="col-md-8">
                       <Card className="shadow-sm">
@@ -256,6 +287,7 @@ function WeeklyReport() {
                             <button
                               className="btn btn-md"
                               onClick={handleSubmit}
+                              disabled={isLoading}
                               style={{
                                 backgroundColor: "#34A85A",
                                 color: "white",
@@ -275,6 +307,7 @@ function WeeklyReport() {
                       </Card>
                     </div>
                   </div>
+                  )}
                 </Card.Body>
               </Card>
             </div>

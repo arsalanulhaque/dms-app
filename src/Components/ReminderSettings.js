@@ -9,10 +9,11 @@ import Select from "react-select";
 
 function ReminderSettings() {
   const [getSession] = useSession();
-  const [daysUntilFirst, setDaysUntilFirst] = useState({ value: 7, label: "7" });
-  const [reminderFrequency, setReminderFrequency] = useState({ value: 1, label: "1" });
+  const [daysUntilFirst, setDaysUntilFirst] = useState(null);
+  const [reminderFrequency, setReminderFrequency] = useState(null);
   const [message, setMessage] = useState("");
   const [alertType, setAlertType] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   // Options for dropdowns
   const daysOptions = Array.from({ length: 7 }, (_, i) => ({
@@ -33,20 +34,34 @@ function ReminderSettings() {
         "get",
         null,
         (result) => {
-          if (!result?.error && result?.data) {
-            const settings = result.data;
-            // console.log("settings from reminder settings --> ", settings);
-            if (settings.DaysUntilFirstReminder) {
-              setDaysUntilFirst(
-                daysOptions.find((d) => d.value === settings.DaysUntilFirstReminder) || daysOptions[6]
-              );
-            }
-            if (settings.ReminderFrequency) {
-              setReminderFrequency(
-                frequencyOptions.find((f) => f.value === settings.ReminderFrequency
-              ) || frequencyOptions[0]
-              );
-            }
+          setIsLoading(false);
+          const settings = result?.data || result;
+          if (!settings) {
+            // No settings yet - show sensible defaults but only after load
+            setDaysUntilFirst(daysOptions[6]); // 7
+            setReminderFrequency(frequencyOptions[0]); // 1
+            return;
+          }
+
+          // Normalize numeric values in case backend sends strings
+          const daysValue = settings.DaysUntilFirstReminder
+            ? Number(settings.DaysUntilFirstReminder)
+            : null;
+          const freqValue = settings.ReminderFrequency
+            ? Number(settings.ReminderFrequency)
+            : null;
+
+          if (daysValue) {
+            setDaysUntilFirst(
+              daysOptions.find((d) => d.value === daysValue) || daysOptions[6]
+            );
+          }
+
+          if (freqValue) {
+            setReminderFrequency(
+              frequencyOptions.find((f) => f.value === freqValue) ||
+                frequencyOptions[0]
+            );
           }
         }
       );
@@ -54,6 +69,8 @@ function ReminderSettings() {
 
     if (getSession()?.schoolID && getSession()?.userID) {
       fetchSettings();
+    } else {
+      setIsLoading(false);
     }
     // eslint-disable-next-line
   }, []);
@@ -86,7 +103,7 @@ function ReminderSettings() {
   };
 
   const handleSubmit = () => {
-    if (!daysUntilFirst.value || !reminderFrequency.value) {
+    if (!daysUntilFirst?.value || !reminderFrequency?.value) {
       setMessage("Please select both settings.");
       setAlertType("warning");
       return;
@@ -100,8 +117,10 @@ function ReminderSettings() {
     };
 
     FetchData("reminder-settings", "post", data, (result) => {
-      if (result?.error) {
-        setMessage(result.message || "Failed to save settings");
+      const response = result?.data || result;
+
+      if (response?.error) {
+        setMessage(response.message || "Failed to save settings");
         setAlertType("danger");
       } else {
         setMessage("Reminder settings saved successfully");
@@ -137,6 +156,12 @@ function ReminderSettings() {
                   </Alert>
                 )}
                 <Card.Body className="pt-4">
+                  {isLoading ? (
+                    <div className="text-center py-5">
+                      <span className="spinner-border text-primary mb-2" role="status" />
+                      <div>Loading reminder settings...</div>
+                    </div>
+                  ) : (
                   <div className="row justify-content-center">
                     <div className="col-md-8">
                       <Card className="shadow-sm">
@@ -181,6 +206,7 @@ function ReminderSettings() {
                             <button
                               className="btn btn-md"
                               onClick={handleSubmit}
+                              disabled={isLoading}
                               style={{
                                 backgroundColor: "#34A85A",
                                 color: "white",
@@ -200,6 +226,7 @@ function ReminderSettings() {
                       </Card>
                     </div>
                   </div>
+                  )}
                 </Card.Body>
               </Card>
             </div>

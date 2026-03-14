@@ -23,7 +23,7 @@ function MenusIU(props) {
     const formik = useFormik({
         enableReinitialize: true,  // This ensures the form will reinitialize when the userData changes
         validationSchema,
-        validateOnChange: true,
+        validateOnChange: false,
         validateOnBlur: false,
         initialValues: {
             MenuID: props?.editRow?.MenuID || -1,
@@ -55,12 +55,6 @@ function MenusIU(props) {
         },
     });
 
-    useEffect(() => {
-        if (props.editRow?.MenuID > -1) {
-            showModal()
-        }
-    }, [props])
-
     const showModal = () => {
         setVisible(true)
         props.handleModalOpen(true);
@@ -72,6 +66,12 @@ function MenusIU(props) {
         setVisible(false)
         props.handleModalClosed(msg, alertType, true);
     };
+
+    useEffect(() => {
+        if (props.editRow?.MenuID > -1) {
+            showModal()
+        }
+    }, [props.editRow?.MenuID])
 
     return (
         <>
@@ -97,9 +97,11 @@ function MenusIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.MenuName}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.MenuName ? formik.errors.MenuName : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.MenuName && (
+                                    <div className="text-danger">
+                                        {formik.errors.MenuName}
+                                    </div>
+                                )}
                             </div>
 
                         </div>
@@ -114,9 +116,11 @@ function MenusIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.Url}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.Url ? formik.errors.Url : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.Url && (
+                                    <div className="text-danger">
+                                        {formik.errors.Url}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -130,9 +134,11 @@ function MenusIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.Icon}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.Icon ? formik.errors.Icon : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.Icon && (
+                                    <div className="text-danger">
+                                        {formik.errors.Icon}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </ModalBody>

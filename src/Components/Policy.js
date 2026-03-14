@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useContext } from 'react';
+import { useState } from 'react';
 
 import Header from './Header';
 import Sidebar from './Sidebar';
@@ -9,7 +9,7 @@ import Alert from 'react-bootstrap/Alert';
 import useSession from '../Context/SessionContext'
 
 function Policy() {
-    const [getSession, setSession] = useSession()
+    const [getSession] = useSession()
     const [editRow, setEditRow] = useState({})
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')

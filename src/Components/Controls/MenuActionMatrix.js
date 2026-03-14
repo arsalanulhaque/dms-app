@@ -259,6 +259,7 @@ function MenuActionMatrix(props) {
     }, [props.roleId, props.schoolId, props.previligeId, props.isAppDeveloper]);
 
     // SIMPLE useEffect for loading existing policies - NO DEPENDENCIES TO AVOID LOOPS
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (!props.roleId || props.roleId <= 0) {
             setSelectedPolicies({});

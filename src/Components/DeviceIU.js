@@ -10,11 +10,10 @@ import * as Yup from 'yup';
 import Dropdown from './Controls/Dropdown'
 import FetchData from '../Hooks/FetchData'
 import Alert from 'react-bootstrap/Alert';
-import { CSVLink } from "react-csv";
 import useSession from '../Context/SessionContext'
 
 function DeviceIU(props) {
-    const [getSession, setSession] = useSession()
+    const [getSession] = useSession()
     const [isVisible, setVisible] = useState(false)
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -31,7 +30,7 @@ function DeviceIU(props) {
     const formik = useFormik({
         enableReinitialize: true,  // This ensures the form will reinitialize when the userData changes
         validationSchema,
-        validateOnChange: true,
+        validateOnChange: false,
         validateOnBlur: false,
         initialValues: {
             SchoolID: props?.editRow?.FKSchoolID || getSession().schoolID,
@@ -72,13 +71,6 @@ function DeviceIU(props) {
 
     });
 
-    useEffect(() => {
-        if (props.editRow?.DeviceID > -1) {
-            showModal()
-        }
-        console.log(formik.values)
-    }, [props, formik])
-
     const showModal = () => {
         setVisible(true)
         props.handleModalOpen(true);
@@ -90,6 +82,13 @@ function DeviceIU(props) {
         setVisible(false)
         props.handleModalClosed(msg, alertType, true);
     }
+
+    useEffect(() => {
+        if (props.editRow?.DeviceID > -1) {
+            showModal()
+        }
+        console.log(formik.values)
+    }, [props.editRow?.DeviceID, formik])
 
 
     return (
@@ -118,9 +117,11 @@ function DeviceIU(props) {
                                         selectedValue={formik.values.SchoolID}
                                         onChange={value => formik.setFieldValue('SchoolID', value.value)}
                                     />
-                                    <div className="text-danger">
-                                        {formik.errors.SchoolID ? formik.errors.SchoolID : null}
-                                    </div>
+                                    {formik.submitCount > 0 && formik.errors.SchoolID && (
+                                        <div className="text-danger">
+                                            {formik.errors.SchoolID}
+                                        </div>
+                                    )}
                                 </div>
                             }
                             <div className="form-group">
@@ -132,9 +133,11 @@ function DeviceIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.IMEI}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.IMEI ? formik.errors.IMEI : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.IMEI && (
+                                    <div className="text-danger">
+                                        {formik.errors.IMEI}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group">
@@ -146,9 +149,11 @@ function DeviceIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.DeviceName}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.DeviceName ? formik.errors.DeviceName : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.DeviceName && (
+                                    <div className="text-danger">
+                                        {formik.errors.DeviceName}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group">
@@ -160,9 +165,11 @@ function DeviceIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.Model}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.Model ? formik.errors.Model : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.Model && (
+                                    <div className="text-danger">
+                                        {formik.errors.Model}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group">
@@ -174,11 +181,11 @@ function DeviceIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.AssetID}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.AssetID
-                                        ? formik.errors.AssetID
-                                        : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.AssetID && (
+                                    <div className="text-danger">
+                                        {formik.errors.AssetID}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group">
@@ -190,11 +197,11 @@ function DeviceIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.BarCode}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.BarCode
-                                        ? formik.errors.BarCode
-                                        : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.BarCode && (
+                                    <div className="text-danger">
+                                        {formik.errors.BarCode}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group form-check">

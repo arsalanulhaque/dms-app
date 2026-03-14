@@ -1,5 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Modal from "react-bootstrap/Modal";
 import ModalHeader from "react-bootstrap/ModalHeader";
 import ModalTitle from "react-bootstrap/ModalTitle";
@@ -13,7 +13,8 @@ import Alert from 'react-bootstrap/Alert';
 import useSession from '../Context/SessionContext'
 
 function UsersIU(props) {
-    const [getSession, setSession] = useSession()
+    const [getSession] = useSession()
+    const session = getSession()
     const [isVisible, setVisible] = useState(false)
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
@@ -32,11 +33,13 @@ function UsersIU(props) {
     const formik = useFormik({
         enableReinitialize: true,
         validationSchema,
-        validateOnChange: true,
+        // Only validate on submit; not on each change/blur
+        validateOnChange: false,
         validateOnBlur: false,
         initialValues: {
             UserID: props?.editRow?.UserID || -1,
-            SchoolID: props?.editRow?.FKSchoolID || -1,
+            // For new users, default SchoolID to the logged-in user's school (for School Admins)
+            SchoolID: props?.editRow?.FKSchoolID || session?.schoolID || -1,
             PreviligeID: props?.editRow?.FKPreviligeID || -1,
             EmailID: props?.editRow?.EmailID || '',
             Username: props?.editRow?.Username || '',
@@ -76,12 +79,17 @@ function UsersIU(props) {
         },
     });
 
+    const showModal = useCallback(() => {
+        setVisible(true)
+        props.handleModalOpen(true);
+    }, [props]);
+
     useEffect(() => {
         if (props?.editRow?.UserID > -1) {
             showModal()
             setSelectedSchoolId(props?.editRow?.FKSchoolID || -1)
         }
-    }, [props, formik])
+    }, [props?.editRow?.UserID, props?.editRow?.FKSchoolID, showModal])
 
     // Handle school selection change
     useEffect(() => {
@@ -90,12 +98,7 @@ function UsersIU(props) {
             setSelectedSchoolId(formik.values.SchoolID)
             formik.setFieldValue('PreviligeID', -1)
         }
-    }, [formik.values.SchoolID])
-
-    const showModal = () => {
-        setVisible(true)
-        props.handleModalOpen(true);
-    };
+    }, [formik, selectedSchoolId])
 
     const hideModal = (alertType, msg) => {
         formik.resetForm()
@@ -135,9 +138,11 @@ function UsersIU(props) {
                                         selectedValue={formik.values.SchoolID}
                                         onChange={handleSchoolChange}
                                     />
+                                {formik.submitCount > 0 && formik.errors.SchoolID && (
                                     <div className="text-danger">
-                                        {formik.errors.SchoolID ? formik.errors.SchoolID : null}
+                                        {formik.errors.SchoolID}
                                     </div>
+                                )}
                                 </div>
                             }
                             
@@ -151,9 +156,11 @@ function UsersIU(props) {
                                     onChange={value => formik.setFieldValue('PreviligeID', value.value)}
                                     disabled={formik.values.SchoolID <= 0}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.PreviligeID ? formik.errors.PreviligeID : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.PreviligeID && (
+                                    <div className="text-danger">
+                                        {formik.errors.PreviligeID}
+                                    </div>
+                                )}
                                 {formik.values.SchoolID <= 0 && (
                                     <small className="text-muted">Please select a school first to see available roles</small>
                                 )}
@@ -168,9 +175,11 @@ function UsersIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.FirstName}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.FirstName ? formik.errors.FirstName : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.FirstName && (
+                                    <div className="text-danger">
+                                        {formik.errors.FirstName}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group">
@@ -182,9 +191,11 @@ function UsersIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.LastName}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.LastName ? formik.errors.LastName : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.LastName && (
+                                    <div className="text-danger">
+                                        {formik.errors.LastName}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group">
@@ -196,9 +207,11 @@ function UsersIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.Username}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.Username ? formik.errors.Username : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.Username && (
+                                    <div className="text-danger">
+                                        {formik.errors.Username}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group">
@@ -210,9 +223,11 @@ function UsersIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.EmailID}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.EmailID ? formik.errors.EmailID : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.EmailID && (
+                                    <div className="text-danger">
+                                        {formik.errors.EmailID}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group">
@@ -224,9 +239,11 @@ function UsersIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.Password}
                                     autoComplete="new-password" />
-                                <div className="text-danger">
-                                    {formik.errors.Password ? formik.errors.Password : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.Password && (
+                                    <div className="text-danger">
+                                        {formik.errors.Password}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group">
@@ -238,9 +255,11 @@ function UsersIU(props) {
                                     onChange={formik.handleChange}
                                     value={formik.values.NfcID}
                                 />
-                                <div className="text-danger">
-                                    {formik.errors.NfcID ? formik.errors.NfcID : null}
-                                </div>
+                                {formik.submitCount > 0 && formik.errors.NfcID && (
+                                    <div className="text-danger">
+                                        {formik.errors.NfcID}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="form-group form-check">

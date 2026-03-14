@@ -1,5 +1,5 @@
 import FetchData from "../Hooks/FetchData";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useSession from "../Context/SessionContext";
 import { useNavigate } from "react-router-dom";
 import Alert from "react-bootstrap/Alert";
@@ -8,7 +8,7 @@ import iconLogin from "../assets/img/login_icon.png";
 
 function Login() {
   const navigate = useNavigate();
-  const [getSession, setSession] = useSession();
+  const [, setSession] = useSession();
   const [alertType, setAlertType] = useState("");
   const [message, setMessage] = useState("");
   const inputRef = useRef(null);
@@ -84,7 +84,7 @@ function Login() {
             <div className="col-lg-6 col-md-6 d-flex flex-column align-items-center justify-content-center">
               <div className="card mb-3 border border-1">
                 <div className="card-header bg-light d-flex flex-row align-items-center">
-                  <img src={iconLogin} className="icon-48" />
+                <img src={iconLogin} alt="Login icon" className="icon-48" />
                   <h1 className="">Login</h1>
                 </div>
                 <div className="card-body">
