@@ -20,7 +20,7 @@ function DeviceIU(props) {
 
     const validationSchema = Yup.object().shape({
         // SchoolID: Yup.number().min(1, 'School is required'),
-        IMEI: Yup.string().required('IMEI is required'),
+        IMEI: Yup.string().required('IMEI / MAC address is required'),
         DeviceName: Yup.string().required('Device name is required'),
         Model: Yup.string().required('Model is required'),
         AssetID: Yup.string().required('Asset ID is required'),
@@ -59,12 +59,23 @@ function DeviceIU(props) {
             }
 
             FetchData(endpoint, httpMethod, body, (result) => {
-                if (!result.data.error) {
-                    hideModal(result?.data?.error === true ? 'danger' : 'success', result?.data?.message)
-                }
-                else {
+                const response = result?.data || result;
+
+                if (!response?.error) {
+                    hideModal(response?.error === true ? 'danger' : 'success', response?.message)
+                } else {
+                    // Provide user-friendly messages for common DB constraint errors
+                    const rawMessage = response?.message || '';
+                    let friendly = 'Unable to save device. Please try again.';
+
+                    if (/duplicate/i.test(rawMessage) && /asset/i.test(rawMessage)) {
+                        friendly = 'This Asset ID is already in use. Please enter a unique Asset ID.';
+                    } else if (/duplicate/i.test(rawMessage) && /(mac|imei)/i.test(rawMessage)) {
+                        friendly = 'This MAC address is already in use. Each device must have a unique MAC address.';
+                    }
+
                     setAlertType('danger')
-                    setMessage(result.data.message)
+                    setMessage(friendly)
                 }
             })
         },
@@ -125,7 +136,7 @@ function DeviceIU(props) {
                                 </div>
                             }
                             <div className="form-group">
-                                <label htmlFor="IMEI">Mac Address</label>
+                                <label htmlFor="IMEI">IMEI</label>
                                 <input
                                     name="IMEI"
                                     type="text"

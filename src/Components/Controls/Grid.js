@@ -207,23 +207,49 @@ const Grid = (props) => {
   }, [props.editRow]);
 
   const formatDate = (params) => {
-    if (!params?.value) return '';
-    try {
-      const date = new Date(params.value);
-      if (date instanceof Date && !isNaN(date)) {
-        return date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        });
-      }
-      return '';
-    } catch (error) {
-      console.warn('Date parsing error:', error);
+    // Show the original value for any non-null date,
+    // and only render an empty cell when the value is truly null/undefined.
+    if (params?.value === null || params?.value === undefined) {
       return '';
     }
+    return String(params.value);
+  };
+
+  /** Format date/time for display. Handles "DD/MM/YYYY HH:mm", ISO strings, or raw fallback. */
+  const formatDateTimeDisplay = (value) => {
+    if (value === null || value === undefined) return '';
+    const raw = String(value).trim();
+    if (!raw) return '';
+
+    // Try "DD/MM/YYYY HH:mm" or "DD/MM/YYYY HH:mm:ss"
+    const dmy = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+    if (dmy) {
+      const [, d, m, y, hh, mm, ss] = dmy;
+      const month = parseInt(m, 10) - 1;
+      const date = new Date(parseInt(y, 10), month, parseInt(d, 10), parseInt(hh, 10), parseInt(mm, 10), ss ? parseInt(ss, 10) : 0);
+      if (!isNaN(date.getTime())) {
+        return date.toLocaleString(undefined, {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+      }
+    }
+
+    // Fallback: ISO or other format
+    const date = new Date(raw);
+    if (!isNaN(date.getTime())) {
+      return date.toLocaleString(undefined, {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    }
+    return raw;
   };
 
   useEffect(() => {
@@ -315,14 +341,8 @@ const Grid = (props) => {
               'Role Name': { minWidth: 150 },
               'Device Name': { minWidth: 150 },
               'Email': { minWidth: 200 },
-              'Issued On': { 
-                minWidth: 150,
-                valueFormatter: formatDate
-              },
-              'Returned On': { 
-                minWidth: 150,
-                valueFormatter: formatDate
-              },
+              'Issued On': { minWidth: 210 },
+              'Returned On': { minWidth: 210 },
               'Admin?': { width: 100, type: 'boolean' },
               'Issued?': { width: 100, type: 'boolean' },
               'NFC ID': { minWidth: 150 },
@@ -360,7 +380,17 @@ const Grid = (props) => {
             };
 
             const headerName = headerMapping[key];
-            if (headerName) {
+
+            // Special handling for device history dates: formatted date/time, blank only when null
+            if (key === 'IssuedDate') {
+              temp.headerName = 'Issued On';
+              temp.minWidth = 220;
+              temp.renderCell = (params) => formatDateTimeDisplay(params.row?.IssuedDate);
+            } else if (key === 'ReturnDate') {
+              temp.headerName = 'Returned On';
+              temp.minWidth = 220;
+              temp.renderCell = (params) => formatDateTimeDisplay(params.row?.ReturnDate);
+            } else if (headerName) {
               temp.headerName = headerName;
               Object.assign(temp, columnConfig[headerName]);
             }

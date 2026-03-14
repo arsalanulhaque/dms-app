@@ -44,18 +44,42 @@ function DevicesBulk() {
     }
 
     const onUpload = () => {
-        const body = { devices: data.splice(1, data.length) }
-        FetchData('device/bulkupload', 'post', body, (response) => {
+        if (!data || data.length === 0) {
+            setAlertType('warning');
+            setMessage('Please upload at least one device before submitting.');
+            return;
+        }
+
+        const body = { devices: data };
+
+        FetchData('device/bulkupload', 'post', body, (result) => {
+            const response = result?.data || result;
+
+            // Handle axios/network errors (HTTP 4xx/5xx, CORS, etc.)
+            if (result?.isAxiosError || result?.response) {
+                const status = result?.response?.status;
+                const serverMessage = result?.response?.data?.message;
+
+                setAlertType('danger');
+                if (status === 400 && serverMessage) {
+                    setMessage(serverMessage);
+                } else if (status === 413) {
+                    setMessage('The uploaded file is too large. Please split it into smaller batches and try again.');
+                } else {
+                    setMessage(serverMessage || 'Device upload failed. Please check the file format and try again.');
+                }
+                return;
+            }
+
             if (response?.error) {
-                setAlertType('danger')
-                setMessage(response?.data?.message)
+                setAlertType('danger');
+                setMessage(response?.message || response?.data?.message || 'Device upload failed. Please check the template and try again.');
+            } else {
+                setAlertType('success');
+                setMessage(response?.message || response?.data?.message || 'Devices uploaded successfully.');
+                setData(undefined);
             }
-            else {
-                setAlertType('success')
-                setMessage(response?.data?.message)
-                setData(undefined)
-            }
-        })
+        });
     }
 
     return (

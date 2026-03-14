@@ -6,7 +6,10 @@ const FetchData = async (endpoint, method, body, callback) => {
     endpoint = process.env.REACT_APP_API_URL + '/'+endpoint
     switch (method) {
       case 'get':
-        response = await axios.get(endpoint);
+        response = await axios.get(endpoint, {
+          headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
+          params: { _t: Date.now() }
+        });
         callback(response.data)
         break;
       case 'delete':
