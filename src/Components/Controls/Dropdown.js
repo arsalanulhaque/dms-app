@@ -3,8 +3,15 @@ import FetchData from '../../Hooks/FetchData'
 import Select from 'react-select'
 import $ from "jquery";
 
-// Simple in-memory cache to avoid refetching the same endpoint repeatedly
+// Cache only for static lookup APIs (menus, actions). Dynamic data (school, previlige, users, etc.) is never cached.
 const dropdownCache = {};
+const CACHEABLE_APIS = ['Menus', 'menus', 'actions', 'action'];
+
+function isCacheableApi(api) {
+    if (!api || typeof api !== 'string') return false;
+    const base = api.split('/')[0];
+    return CACHEABLE_APIS.some(allow => base === allow || base.toLowerCase() === allow.toLowerCase());
+}
 
 function Dropdown(props) {
     const [data, setData] = useState([])
@@ -30,8 +37,8 @@ function Dropdown(props) {
             return;
         }
 
-        // When refreshKey is provided (e.g. when modal opens), bypass cache so list is fresh
-        const useCache = props.refreshKey == null;
+        // Only use cache for static APIs, and only when refreshKey is not provided
+        const useCache = props.refreshKey == null && isCacheableApi(props.api);
 
         if (useCache && dropdownCache[props.api]) {
             setData(dropdownCache[props.api]);
