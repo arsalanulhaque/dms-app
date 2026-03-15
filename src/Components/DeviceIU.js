@@ -34,7 +34,7 @@ function DeviceIU(props) {
         validateOnBlur: false,
         initialValues: {
             SchoolID: props?.editRow?.FKSchoolID || getSession().schoolID,
-            IMEI: props?.editRow?.MacAddress || "",
+            IMEI: props?.editRow?.IMEI || "",
             DeviceName: props?.editRow?.DeviceName || "",
             SchoolName: "",
             Model: props?.editRow?.Model || "",

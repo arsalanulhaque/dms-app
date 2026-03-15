@@ -341,8 +341,8 @@ const Grid = (props) => {
               'Role Name': { minWidth: 150 },
               'Device Name': { minWidth: 150 },
               'Email': { minWidth: 200 },
-              'Issued On': { minWidth: 210 },
-              'Returned On': { minWidth: 210 },
+              'Last Issued': { minWidth: 210 },
+              'Last Returned': { minWidth: 210 },
               'Admin?': { width: 100, type: 'boolean' },
               'Issued?': { width: 100, type: 'boolean' },
               'NFC ID': { minWidth: 150 },
@@ -371,8 +371,8 @@ const Grid = (props) => {
               PreviligeName: 'Role Name',
               DeviceName: 'Device Name',
               EmailID: 'Email',
-              IssuedDate: 'Issued On',
-              ReturnDate: 'Returned On',
+              IssuedDate: 'Last Issued',
+              ReturnDate: 'Last Returned',
               IsAdmin: 'Admin?',
               IsIssued: 'Issued?',
               NfcID: 'NFC ID',
@@ -383,11 +383,11 @@ const Grid = (props) => {
 
             // Special handling for device history dates: formatted date/time, blank only when null
             if (key === 'IssuedDate') {
-              temp.headerName = 'Issued On';
+              temp.headerName = 'Last Issued';
               temp.minWidth = 220;
               temp.renderCell = (params) => formatDateTimeDisplay(params.row?.IssuedDate);
             } else if (key === 'ReturnDate') {
-              temp.headerName = 'Returned On';
+              temp.headerName = 'Last Returned';
               temp.minWidth = 220;
               temp.renderCell = (params) => formatDateTimeDisplay(params.row?.ReturnDate);
             } else if (headerName) {

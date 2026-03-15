@@ -21,6 +21,7 @@ function PolicyIU(props) {
     const [selectedPolicies, setSelectedPolicies] = useState([])
     const [existingPolicies, setExistingPolicies] = useState([])
     const [isEditMode, setIsEditMode] = useState(false)
+    const [selectedSchoolId, setSelectedSchoolId] = useState(getSession()?.schoolID || -1)
 
     const validationSchema = Yup.object().shape({
         PreviligeID: Yup.number().min(1, 'Role is required'),
@@ -77,6 +78,8 @@ function PolicyIU(props) {
     useEffect(() => {
         if (props.editRow?.FKPreviligeID > -1) {
             setIsEditMode(true);
+            // Ensure the correct school is selected when editing
+            setSelectedSchoolId(props.editRow.FKSchoolID || getSession()?.schoolID || -1);
             // Load all existing policies for this role
             loadExistingPolicies(props.editRow.FKPreviligeID);
             showModal();
@@ -123,6 +126,7 @@ function PolicyIU(props) {
         setExistingPolicies([]);
         setIsEditMode(false);
         setVisible(false);
+        setSelectedSchoolId(getSession()?.schoolID || -1);
         props.handleModalClosed(msg, alertType, true);
     };
 
@@ -143,15 +147,45 @@ function PolicyIU(props) {
                             {message}
                         </Alert>}
 
+                        {/* Only app developers can choose a school; others are locked to their own school */}
+                        {getSession()?.isAppDeveloper === true && (
+                            <div className="form-group mb-3">
+                                <label htmlFor="SchoolID">School</label>
+                                <Dropdown
+                                    name="SchoolID"
+                                    api="school"
+                                    keyField="SchoolID"
+                                    valueField="SchoolName"
+                                    selectedValue={selectedSchoolId}
+                                    onChange={value => {
+                                        const schoolId = value?.value || -1;
+                                        setSelectedSchoolId(schoolId);
+                                        // Reset role & policies when school changes
+                                        formik.setFieldValue('PreviligeID', -1);
+                                        setSelectedPolicies([]);
+                                        setExistingPolicies([]);
+                                    }}
+                                    disabled={isEditMode}
+                                />
+                            </div>
+                        )}
+
                         <div className="form-group mb-3">
                             <label htmlFor="PreviligeID">Role Name</label>
-                            <Dropdown name="PreviligeID"
-                                api={getSession()?.isAppDeveloper === true ? `previlige` : `previlige/${getSession()?.schoolID}`}
-                                keyField='PreviligeID'
-                                valueField='PreviligeName'
+                            <Dropdown
+                                name="PreviligeID"
+                                api={
+                                    getSession()?.isAppDeveloper === true
+                                        ? (selectedSchoolId > 0
+                                            ? `previlige/${selectedSchoolId}`
+                                            : 'previlige')
+                                        : `previlige/${getSession()?.schoolID}`
+                                }
+                                keyField="PreviligeID"
+                                valueField="PreviligeName"
                                 selectedValue={formik.values.PreviligeID}
                                 onChange={value => formik.setFieldValue('PreviligeID', value.value)}
-                                disabled={isEditMode}
+                                disabled={isEditMode || (getSession()?.isAppDeveloper === true && selectedSchoolId <= 0)}
                             />
                             <div className="text-danger">
                                 {formik.errors.PreviligeID ? formik.errors.PreviligeID : null}
@@ -162,7 +196,7 @@ function PolicyIU(props) {
                             <div className="form-group mb-3">
                                 <MenuActionMatrix
                                     roleId={formik.values.PreviligeID}
-                                    schoolId={getSession()?.schoolID}
+                                    schoolId={getSession()?.isAppDeveloper === true ? selectedSchoolId : getSession()?.schoolID}
                                     previligeId={getSession()?.previligeID}
                                     isAppDeveloper={getSession()?.isAppDeveloper === true}
                                     existingPolicies={existingPolicies}

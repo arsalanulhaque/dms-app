@@ -68,13 +68,22 @@ function UsersIU(props) {
             }
 
             FetchData(endpoint, httpMethod, body, (result) => {
-                if (!result.data.error) {
-                    hideModal(result?.data?.error === true ? 'danger' : 'success', result?.data?.message)
+                // Handle axios error (4xx/5xx): backend validation e.g. duplicate NFC
+                if (result?.isAxiosError || result?.response) {
+                    const status = result?.response?.status;
+                    const serverMessage = result?.response?.data?.message;
+                    setAlertType('danger');
+                    setMessage(serverMessage || result?.message || 'Request failed. Please try again.');
+                    return;
                 }
-                else {
-                    setAlertType('danger')
-                    setMessage(result.data.message)
+                // Success response
+                if (!result?.data?.error) {
+                    hideModal('success', result?.data?.message);
+                    return;
                 }
+                // 200 with error in body
+                setAlertType('danger');
+                setMessage(result?.data?.message || 'Something went wrong.');
             })
         },
     });
