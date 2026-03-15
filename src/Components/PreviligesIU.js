@@ -18,6 +18,7 @@ function PreviligesIU(props) {
     const [isVisible, setVisible] = useState(false)
     const [message, setMessage] = useState('')
     const [alertType, setAlertType] = useState('')
+    const [schoolDropdownKey, setSchoolDropdownKey] = useState(0)
 
     const validationSchema = Yup.object().shape({
         SchoolID: Yup.number().required('School ID is required'),
@@ -65,6 +66,7 @@ function PreviligesIU(props) {
     });
 
     const showModal = useCallback(() => {
+        setSchoolDropdownKey(k => k + 1)
         setVisible(true)
         props.handleModalOpen(true);
     }, [props]);
@@ -106,6 +108,7 @@ function PreviligesIU(props) {
                                         valueField='SchoolName'
                                         selectedValue={formik.values.SchoolID}
                                         onChange={value => formik.setFieldValue('SchoolID', value.value)}
+                                        refreshKey={schoolDropdownKey}
                                     />
                                     {formik.submitCount > 0 && formik.errors.SchoolID && (
                                         <div className="text-danger">

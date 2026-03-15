@@ -30,8 +30,10 @@ function Dropdown(props) {
             return;
         }
 
-        // If we already have cached options for this API, reuse them
-        if (dropdownCache[props.api]) {
+        // When refreshKey is provided (e.g. when modal opens), bypass cache so list is fresh
+        const useCache = props.refreshKey == null;
+
+        if (useCache && dropdownCache[props.api]) {
             setData(dropdownCache[props.api]);
             return;
         }
@@ -65,7 +67,7 @@ function Dropdown(props) {
                             })
                         }
                     });
-                    dropdownCache[props.api] = options;
+                    if (useCache) dropdownCache[props.api] = options;
                     setData(options);
                 } else {
                     console.error('Response data is not an array:', dataArray);
@@ -76,7 +78,7 @@ function Dropdown(props) {
                 setData([{ value: -1, label: 'Error loading options' }]);
             }
         })
-    }, [props.api, props.keyField, props.valueField]) // Add all used props as dependencies
+    }, [props.api, props.keyField, props.valueField, props.refreshKey])
 
     const defaultValue = (options, value) => {
         return options ? options.find(option => option.value === value) : ''
