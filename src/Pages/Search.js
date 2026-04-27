@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import useSession from "../Context/SessionContext";
 import FetchData from "../Hooks/FetchData";
@@ -14,11 +14,13 @@ import {
   Container,
   CircularProgress,
   Breadcrumbs,
+  Chip,
 } from "@mui/material";
 import {
   Home as HomeIcon,
   Clear as ClearIcon,
   QrCodeScanner as ScanIcon,
+  Devices as DevicesIcon,
 } from "@mui/icons-material";
 
 function Search() {
@@ -30,6 +32,23 @@ function Search() {
   const [lstIssuedDevices, setIssuedDevices] = useState([]);
   const [lstAvailableDevices, setAvailableDevices] = useState([]);
   const [lstUnavailableDevices, setUnavailableDevices] = useState([]);
+  const [bookedDevices, setBookedDevices] = useState([]);
+
+  const sessionUserID = getSession()?.data?.[0]?.UserID;
+
+  const loadBookedDevices = useCallback(() => {
+    if (!sessionUserID) return;
+    FetchData(
+      `devicestatus/user/${sessionUserID}/active`,
+      "get",
+      null,
+      (response) => {
+        if (response?.error === false && Array.isArray(response?.data)) {
+          setBookedDevices(response.data);
+        }
+      }
+    );
+  }, [sessionUserID]);
 
   useEffect(() => {
     let intervalID = setInterval(() => {
@@ -42,6 +61,10 @@ function Search() {
       clearInterval(intervalID);
     };
   }, []);
+
+  useEffect(() => {
+    loadBookedDevices();
+  }, [loadBookedDevices]);
 
   const onItemScan = (e) => {
     if (e.key === "Enter" || e.keyCode === 13) {
@@ -177,6 +200,7 @@ function Search() {
         setAlertType("success");
         setMessage(response?.data?.message);
         reset();
+        loadBookedDevices();
       }
     });
   };
@@ -191,6 +215,7 @@ function Search() {
         setAlertType("success");
         setMessage(response?.data?.message);
         reset();
+        loadBookedDevices();
       }
     });
   };
@@ -354,6 +379,83 @@ function Search() {
               </Typography>
             </Paper>
           )}
+
+        {/* Booked Devices Summary - shows the total devices currently booked by the logged-in user */}
+        {sessionUserID && (
+          <Paper
+            elevation={0}
+            sx={{
+              mt: 3,
+              p: 3,
+              backgroundColor: "#fff",
+              boxShadow: "0 0 10px rgba(0,0,0,0.05)",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                mb: 2,
+                flexWrap: "wrap",
+                gap: 1,
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <DevicesIcon sx={{ color: "primary.main", mr: 1 }} />
+                <Typography variant="h6" component="h3" sx={{ m: 0 }}>
+                  My Booked Devices
+                </Typography>
+              </Box>
+              <Chip
+                color="primary"
+                label={`${bookedDevices.length} device${
+                  bookedDevices.length === 1 ? "" : "s"
+                } booked`}
+              />
+            </Box>
+
+            {bookedDevices.length === 0 ? (
+              <Typography variant="body2" color="text.secondary">
+                You currently have no devices booked.
+              </Typography>
+            ) : (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                {bookedDevices.map((device) => (
+                  <Box
+                    key={
+                      device.DeviceStatusID ||
+                      `${device.AssetID}-${device.IssuedDate}`
+                    }
+                    sx={{
+                      border: "1px solid #e0e0e0",
+                      borderRadius: 1,
+                      p: 1.5,
+                      display: "flex",
+                      flexWrap: "wrap",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                        Asset# {device.AssetID || "N/A"}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {device.DeviceName || "Device"}
+                        {device.Model ? ` · ${device.Model}` : ""}
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Taken On: {device.IssuedDate || "NA"}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </Paper>
+        )}
       </Container>
     </>
   );

@@ -1,14 +1,32 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../Components/Header';
 import Sidebar from '../Components/Sidebar';
 import useSession from '../Context/SessionContext';
+import FetchData from '../Hooks/FetchData';
 import { Box, Typography, Paper, Grid, Container } from '@mui/material';
 import { School as SchoolIcon, Devices as DevicesIcon, People as PeopleIcon, History as HistoryIcon } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 
 function Dashboard() {
     const [getSession] = useSession();
-    const userName = getSession()?.data[0]?.Username || 'User';
+    const sessionUser = getSession()?.data?.[0] || {};
+    const userName = sessionUser.Username || 'User';
+    const sessionSchoolName = sessionUser.SchoolName;
+    const schoolID = getSession()?.schoolID;
+    const isAppDeveloper = getSession()?.isAppDeveloper === true;
+    const [schoolName, setSchoolName] = useState(sessionSchoolName || '');
+
+    useEffect(() => {
+        // Fetch the school name when not embedded in the session payload (white-labeling).
+        // App Developers (Super Admins) are not tied to a single school, so skip the lookup.
+        if (sessionSchoolName || isAppDeveloper || !schoolID) return;
+
+        FetchData(`school/${schoolID}`, 'get', null, (response) => {
+            if (response?.error === false && Array.isArray(response?.data) && response.data.length > 0) {
+                setSchoolName(response.data[0]?.SchoolName || '');
+            }
+        });
+    }, [sessionSchoolName, isAppDeveloper, schoolID]);
 
 
     const quickLinks = [
@@ -53,6 +71,14 @@ function Dashboard() {
                         <Typography variant="h4" component="h1" gutterBottom>
                             Welcome, {userName}! 👋
                         </Typography>
+                        {schoolName && (
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                <SchoolIcon sx={{ fontSize: 24, color: '#1976d2', mr: 1 }} />
+                                <Typography variant="h6" component="h2" sx={{ color: '#1976d2', fontWeight: 500 }}>
+                                    {schoolName}
+                                </Typography>
+                            </Box>
+                        )}
                         <Typography variant="body1" color="text.secondary" paragraph>
                             This is your Asset Management System dashboard. Use the sidebar menu to navigate through different sections of the application.
                         </Typography>

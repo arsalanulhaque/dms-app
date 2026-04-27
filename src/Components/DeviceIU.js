@@ -12,6 +12,19 @@ import FetchData from '../Hooks/FetchData'
 import Alert from 'react-bootstrap/Alert';
 import useSession from '../Context/SessionContext'
 
+// Translate raw backend/SQL messages into user-friendly text for the form.
+const mapDeviceErrorMessage = (rawMessage) => {
+    const message = String(rawMessage || '');
+    if (!message) return '';
+    if (/asset/i.test(message)) {
+        return 'This Asset ID is already in use in this school. Please enter a unique Asset ID.';
+    }
+    if (/(imei|mac)/i.test(message) && /(duplicate|exists|already)/i.test(message)) {
+        return 'This IMEI / MAC address is already in use. Please enter a unique value.';
+    }
+    return '';
+};
+
 function DeviceIU(props) {
     const [getSession] = useSession()
     const [isVisible, setVisible] = useState(false)
@@ -59,24 +72,27 @@ function DeviceIU(props) {
             }
 
             FetchData(endpoint, httpMethod, body, (result) => {
-                const response = result?.data || result;
-
-                if (!response?.error) {
-                    hideModal(response?.error === true ? 'danger' : 'success', response?.message)
-                } else {
-                    // Provide user-friendly messages for common DB constraint errors
-                    const rawMessage = response?.message || '';
-                    let friendly = 'Unable to save device. Please try again.';
-
-                    if (/duplicate/i.test(rawMessage) && /asset/i.test(rawMessage)) {
-                        friendly = 'This Asset ID is already in use. Please enter a unique Asset ID.';
-                    } else if (/duplicate/i.test(rawMessage) && /(mac|imei)/i.test(rawMessage)) {
-                        friendly = 'This MAC address is already in use. Each device must have a unique MAC address.';
-                    }
-
-                    setAlertType('danger')
-                    setMessage(friendly)
+                // Handle axios error (4xx/5xx): backend validation e.g. duplicate Asset ID.
+                // Without this branch axios's thrown error would be treated as success
+                // and the modal would close on a 400 response.
+                if (result?.isAxiosError || result?.response) {
+                    const serverMessage = result?.response?.data?.message;
+                    const friendly = mapDeviceErrorMessage(serverMessage);
+                    setAlertType('danger');
+                    setMessage(friendly || serverMessage || result?.message || 'Request failed. Please try again.');
+                    return;
                 }
+
+                // Success response (axios resolves with the response object on 2xx)
+                if (!result?.data?.error) {
+                    hideModal('success', result?.data?.message);
+                    return;
+                }
+
+                // 200 with error in body
+                const rawMessage = result?.data?.message || '';
+                setAlertType('danger');
+                setMessage(mapDeviceErrorMessage(rawMessage) || rawMessage || 'Something went wrong.');
             })
         },
 
